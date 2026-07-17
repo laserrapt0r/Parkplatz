@@ -66,9 +66,10 @@ thanks to a service worker that caches the whole game.
 ### Accessibility & options
 - **Colorblind mode** — adds distinct patterns to vehicles on top of color.
 - **Reduced motion** — respects `prefers-reduced-motion` (Auto/Reduced/Full).
-- **12 languages:** German, English, Spanish, French, Italian, Portuguese,
-  Dutch, Polish, Simplified & Traditional Chinese, Japanese and Arabic (with
-  full right-to-left layout) — auto-detected and switchable any time.
+- **15 languages:** German, English, Spanish, French, Italian, Portuguese,
+  Dutch, Polish, Simplified & Traditional Chinese, Japanese, Arabic (with full
+  right-to-left layout), Korean, Russian and Turkish — auto-detected and
+  switchable any time.
 - **Settings screen:** language, SFX & music volume, theme, colorblind, motion,
   star gating and a progress reset.
 
