@@ -5,8 +5,14 @@
   'use strict';
 
   let ctx = null;
-  let master = null;
+  let master = null;      // sfx bus
+  let musicBus = null;    // music bus
   let enabled = true;
+  let sfxVol = 0.9;
+  let musicVol = 0.5;
+  let musicOn = false;
+  let musicTimer = null;
+  let musicStep = 0;
 
   function ensure() {
     if (ctx) return;
@@ -14,8 +20,11 @@
     if (!AC) return;
     ctx = new AC();
     master = ctx.createGain();
-    master.gain.value = 0.9;
+    master.gain.value = sfxVol;
     master.connect(ctx.destination);
+    musicBus = ctx.createGain();
+    musicBus.gain.value = musicVol * 0.5;
+    musicBus.connect(ctx.destination);
   }
 
   // A short tone with an ADSR-ish envelope.
@@ -60,9 +69,54 @@
     src.start(t); src.stop(t + dur + 0.02);
   }
 
+  // ---- background music: a slow, gentle synthesized pad + arpeggio loop ----
+  // A-minor pentatonic-ish progression, very quiet, purely generative.
+  const MUSIC_ROOT = [220.0, 261.63, 293.66, 329.63, 392.0]; // A3 C4 D4 E4 G4
+  const BASS = [110.0, 130.81, 146.83, 98.0]; // A2 C3 D3 G2 per bar
+  function musicTick() {
+    if (!ctx || !musicOn) return;
+    const bar = Math.floor(musicStep / 8) % BASS.length;
+    const t = ctx.currentTime;
+    // bass note at start of each bar
+    if (musicStep % 8 === 0) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = BASS[bar];
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.18, t + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+      o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 1.7);
+    }
+    // soft arpeggio note
+    const note = MUSIC_ROOT[(musicStep * 2 + bar) % MUSIC_ROOT.length] * (musicStep % 16 < 8 ? 1 : 1.5);
+    const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+    o2.type = 'triangle'; o2.frequency.value = note;
+    g2.gain.setValueAtTime(0.0001, t);
+    g2.gain.exponentialRampToValueAtTime(0.06, t + 0.04);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+    o2.connect(g2); g2.connect(musicBus); o2.start(t); o2.stop(t + 0.55);
+    musicStep++;
+  }
+  function startMusic() {
+    ensure();
+    if (!ctx || musicTimer) return;
+    musicOn = true;
+    musicTick();
+    musicTimer = setInterval(musicTick, 380);
+  }
+  function stopMusic() {
+    musicOn = false;
+    if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+  }
+
   const Audio = {
     get enabled() { return enabled; },
     setEnabled(on) { enabled = !!on; if (enabled) ensure(); },
+    get musicEnabled() { return musicOn; },
+    setMusicEnabled(on) {
+      if (on) startMusic(); else stopMusic();
+    },
+    setSfxVol(v) { sfxVol = +v; if (master) master.gain.value = sfxVol; },
+    setMusicVol(v) { musicVol = +v; if (musicBus) musicBus.gain.value = musicVol * 0.5; },
     // Must be called from a user gesture to unlock audio on most browsers.
     unlock() {
       ensure();

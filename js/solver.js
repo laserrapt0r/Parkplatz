@@ -113,5 +113,53 @@
     return { id: v.id, index: firstMoveIdx, axis, delta };
   }
 
-  window.Solver = { solveNext };
+  // Full solve: minimum number of moves (slides) to free the target, or -1 if
+  // unsolvable / above the state cap. Used by the level editor and generator.
+  function solve(size, vehicles, cap) {
+    const N = size;
+    cap = cap || 200000;
+    const M = vehicles.length;
+    const ti = vehicles.findIndex((v) => v.target);
+    if (ti < 0) return -1;
+    const goalCol = N - vehicles[ti].len;
+    const isH = vehicles.map((v) => v.orient === 'H');
+    const len = vehicles.map((v) => v.len);
+    const grid = new Int8Array(N * N);
+
+    const start = new Int8Array(M);
+    for (let i = 0; i < M; i++) start[i] = vehicles[i].row * N + vehicles[i].col;
+    if (start[ti] % N === goalCol) return 0;
+
+    const key = (s) => { let x = ''; for (let i = 0; i < M; i++) x += String.fromCharCode(s[i]); return x; };
+    const visited = new Set([key(start)]);
+    let frontier = [start];
+    let depth = 0;
+    while (frontier.length) {
+      depth++;
+      const next = [];
+      for (const st of frontier) {
+        grid.fill(-1);
+        for (let i = 0; i < M; i++) {
+          const r0 = (st[i] / N) | 0, c0 = st[i] % N;
+          if (isH[i]) for (let k = 0; k < len[i]; k++) grid[r0 * N + c0 + k] = i;
+          else for (let k = 0; k < len[i]; k++) grid[(r0 + k) * N + c0] = i;
+        }
+        for (let i = 0; i < M; i++) {
+          const r0 = (st[i] / N) | 0, c0 = st[i] % N;
+          if (isH[i]) {
+            for (let c = c0 - 1; c >= 0; c--) { if (grid[r0 * N + c] !== -1) break; const ns = st.slice(); ns[i] = r0 * N + c; const k = key(ns); if (!visited.has(k)) { visited.add(k); if (i === ti && c === goalCol) return depth; next.push(ns); } }
+            for (let c = c0 + len[i]; c < N; c++) { if (grid[r0 * N + c] !== -1) break; const nc = c - len[i] + 1; const ns = st.slice(); ns[i] = r0 * N + nc; const k = key(ns); if (!visited.has(k)) { visited.add(k); if (i === ti && nc === goalCol) return depth; next.push(ns); } }
+          } else {
+            for (let r = r0 - 1; r >= 0; r--) { if (grid[r * N + c0] !== -1) break; const ns = st.slice(); ns[i] = r * N + c0; const k = key(ns); if (!visited.has(k)) { visited.add(k); next.push(ns); } }
+            for (let r = r0 + len[i]; r < N; r++) { if (grid[r * N + c0] !== -1) break; const nr = r - len[i] + 1; const ns = st.slice(); ns[i] = nr * N + c0; const k = key(ns); if (!visited.has(k)) { visited.add(k); next.push(ns); } }
+          }
+        }
+        if (visited.size > cap) return -1;
+      }
+      frontier = next;
+    }
+    return -1;
+  }
+
+  window.Solver = { solveNext, solve };
 })();

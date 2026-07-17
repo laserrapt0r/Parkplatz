@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26314a"/>
+      <stop offset="1" stop-color="#141a26"/>
+    </linearGradient>
+    <linearGradient id="lot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a4150"/>
+      <stop offset="1" stop-color="#333a48"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff7a7f"/>
+      <stop offset="1" stop-color="#ef4a50"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b9dff"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4bd0a0"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="86" y="86" width="340" height="340" rx="40" fill="url(#lot)" stroke="#c9ced8" stroke-width="12"/>
+  <!-- vertical blockers -->
+  <rect x="120" y="112" width="70" height="150" rx="16" fill="url(#blue)"/>
+  <rect x="322" y="112" width="70" height="150" rx="16" fill="url(#green)"/>
+  <!-- target red car on exit row -->
+  <rect x="112" y="300" width="170" height="72" rx="20" fill="url(#red)"/>
+  <rect x="150" y="312" width="42" height="48" rx="10" fill="rgba(150,205,230,0.9)"/>
+  <!-- exit gap + chevrons -->
+  <g stroke="#78e696" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <polyline points="360,306 392,336 360,366"/>
+    <polyline points="392,306 424,336 392,366"/>
+  </g>
+</svg>
