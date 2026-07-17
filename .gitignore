@@ -28,3 +28,8 @@ tmp/
 .env.*
 *.pem
 secrets.*
+
+# Android signing keystores — NEVER commit these
+*.jks
+*.keystore
+key.properties
