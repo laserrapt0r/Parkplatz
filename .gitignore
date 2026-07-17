@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build / temp
+dist/
+build/
+tmp/
+.cache/
+
+# Secrets — never commit tokens or credentials
+.env
+.env.*
+*.pem
+secrets.*

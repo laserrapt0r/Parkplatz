@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1b2436" />
+  <title>Parkplatz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231b2436'/%3E%3Ctext y='72' x='50' font-size='60' text-anchor='middle' fill='%23ff5a5f' font-family='Arial' font-weight='bold'%3EP%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Top bar -->
+    <header id="topbar">
+      <button id="btn-home" class="icon-btn" title="Menu" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V21a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+      </button>
+      <h1 id="brand"><span class="brand-p">P</span>arkplatz</h1>
+      <div class="top-right">
+        <button id="btn-sound" class="icon-btn" title="Sound" aria-label="Sound">
+          <svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 1.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+        </button>
+        <button id="btn-lang" class="lang-btn" title="Language">DE</button>
+      </div>
+    </header>
+
+    <!-- Menu screen -->
+    <section id="screen-menu" class="screen active">
+      <div class="menu-hero">
+        <div class="menu-logo" aria-hidden="true">
+          <div class="logo-lot">
+            <span class="logo-car car-a"></span>
+            <span class="logo-car car-b"></span>
+            <span class="logo-car car-c"></span>
+            <span class="logo-exit"></span>
+          </div>
+        </div>
+        <h2 class="menu-title">Parkplatz</h2>
+        <p class="menu-sub" data-i18n="tagline">Befreie das rote Auto aus dem Stau.</p>
+        <div class="menu-actions">
+          <button id="btn-play" class="btn btn-primary" data-i18n="play">Spielen</button>
+          <button id="btn-howto" class="btn btn-ghost" data-i18n="howto">Anleitung</button>
+        </div>
+        <p class="menu-progress"><span data-i18n="solvedLabel">Gelöst</span>: <span id="menu-solved">0</span>/100 · <span id="menu-stars">0</span> <span class="mini-star">★</span></p>
+      </div>
+    </section>
+
+    <!-- Level select screen -->
+    <section id="screen-levels" class="screen">
+      <div class="levels-head">
+        <h2 data-i18n="chooseLevel">Level wählen</h2>
+      </div>
+      <div id="levels-container"></div>
+    </section>
+
+    <!-- Game screen -->
+    <section id="screen-game" class="screen">
+      <div class="game-hud">
+        <button id="btn-back" class="btn btn-ghost btn-sm" data-i18n="levelsShort">Level</button>
+        <div class="hud-info">
+          <div class="hud-item">
+            <span class="hud-label" data-i18n="levelWord">Level</span>
+            <span id="hud-level" class="hud-value">1</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label" data-i18n="movesWord">Züge</span>
+            <span id="hud-moves" class="hud-value">0</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label" data-i18n="parWord">Minimum</span>
+            <span id="hud-par" class="hud-value">0</span>
+          </div>
+          <div class="hud-item hud-stars">
+            <span id="hud-star-1" class="hud-star">★</span>
+            <span id="hud-star-2" class="hud-star">★</span>
+            <span id="hud-star-3" class="hud-star">★</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <canvas id="board"></canvas>
+      </div>
+
+      <div class="game-controls">
+        <button id="btn-undo" class="btn btn-ghost" data-i18n="undo">Rückgängig</button>
+        <button id="btn-restart" class="btn btn-ghost" data-i18n="restart">Neustart</button>
+        <button id="btn-hint" class="btn btn-ghost" data-i18n="hint">Tipp</button>
+      </div>
+    </section>
+
+    <!-- Win overlay -->
+    <div id="overlay-win" class="overlay">
+      <div class="win-card">
+        <h2 id="win-title" data-i18n="solved">Gelöst!</h2>
+        <div class="win-stars">
+          <span class="win-star" data-idx="0">★</span>
+          <span class="win-star" data-idx="1">★</span>
+          <span class="win-star" data-idx="2">★</span>
+        </div>
+        <p class="win-line"><span data-i18n="movesWord">Züge</span>: <span id="win-moves">0</span>
+          · <span data-i18n="parWord">Minimum</span>: <span id="win-par">0</span></p>
+        <p id="win-msg" class="win-msg"></p>
+        <div class="win-actions">
+          <button id="btn-win-retry" class="btn btn-ghost" data-i18n="retry">Nochmal</button>
+          <button id="btn-win-levels" class="btn btn-ghost" data-i18n="levelsShort">Level</button>
+          <button id="btn-win-next" class="btn btn-primary" data-i18n="next">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- How-to overlay -->
+    <div id="overlay-howto" class="overlay">
+      <div class="howto-card">
+        <h2 data-i18n="howtoTitle">So wird gespielt</h2>
+        <ul class="howto-list">
+          <li data-i18n="howto1">Ziehe die Fahrzeuge mit der Maus – längs oder quer.</li>
+          <li data-i18n="howto2">Fahrzeuge bewegen sich nur in ihre Richtung und können nicht überlappen.</li>
+          <li data-i18n="howto3">Mache den Weg frei, damit das rote Auto zum Ausgang fahren kann.</li>
+          <li data-i18n="howto4">Weniger Züge = mehr Sterne. Schaffst du das Minimum, gibt es drei Sterne.</li>
+        </ul>
+        <button id="btn-howto-close" class="btn btn-primary" data-i18n="gotit">Los geht's</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/puzzles-data.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/solver.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
