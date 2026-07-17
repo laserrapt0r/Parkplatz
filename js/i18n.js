@@ -268,10 +268,43 @@
       share: 'Udostępnij', linkCopied: 'Skopiowano link!', install: 'Zainstaluj aplikację',
       customBadge: 'Własne', dailyBadge: 'Dzienna', randomBadge: 'Losowa',
     },
+    zh: {
+      tagline: '把红色小车从堵车中解救出来。',
+      play: '开始游戏', howto: '玩法说明', solvedLabel: '已解决', chooseLevel: '选择关卡',
+      levelsShort: '关卡', levelWord: '关卡', movesWord: '步数', parWord: '最少',
+      undo: '撤销', restart: '重来', hint: '提示', solved: '完成！', retry: '再来一次', next: '下一关',
+      howtoTitle: '玩法说明',
+      howto1: '用鼠标拖动车辆——横向或纵向。',
+      howto2: '车辆只能沿自身方向移动，且不能重叠。',
+      howto3: '清出通道，让红色小车开到出口。',
+      howto4: '步数越少，星星越多。达到最少步数即可获得三颗星。',
+      gotit: '开始吧',
+      leicht: '简单', mittel: '中等', schwer: '困难', sehr_schwer: '非常困难',
+      msg3: '完美！一步都不多。', msg2: '干得不错——还能再短一点。', msg1: '解决了！试着用更少的步数。',
+      allDone: '所有关卡都通关了！太棒了！', hintNone: '暂无提示。', hintSolved: '就差一点——把它开出去！',
+      modeCampaign: '闯关模式', modeDaily: '每日谜题', modeRandom: '随机谜题', editor: '关卡编辑器', settings: '设置', menu: '菜单',
+      dailyTitle: '每日谜题', dailyToday: '今天', dailyDoneToday: '今天已解决',
+      randomTitle: '随机谜题', randomPick: '选择难度', generating: '正在生成谜题…', newRandom: '新谜题',
+      language: '语言', soundLabel: '音效', musicLabel: '背景音乐', sfxVolume: '音效音量', musicVolume: '音乐音量',
+      colorblindMode: '色盲模式', colorblindHint: '除颜色外增加图案',
+      themeLabel: '主题', themeTag: '白天', themeNacht: '夜晚', themeNeon: '霓虹',
+      motionLabel: '动画', motionAuto: '自动', motionReduced: '减弱', motionFull: '完整',
+      gatingLabel: '用星星解锁关卡', resetProgress: '重置进度', resetConfirm: '确定要删除所有进度吗？',
+      on: '开', off: '关', locked: '已锁定', needStars: '需要 {n} ⭐',
+      editorTitle: '关卡编辑器', toolTarget: '目标', toolMoto: '摩托车', toolCar: '轿车', toolBus: '公交车', toolTruck: '卡车', toolErase: '删除',
+      orientation: '方向', horizontal: '横向', vertical: '纵向', clear: '清空', randomFill: '随机', test: '测试', save: '保存',
+      editorNoTarget: '把红色目标车放到出口所在的那一行。', editorUnsolvable: '无解——请调整布局。',
+      editorSolvable: '{n} 步可解', editorTrivial: '太简单了——加些障碍。', editorTooBig: '太复杂，无法检测。',
+      myLevels: '我的关卡', noCustom: '还没有保存自定义关卡。', namePrompt: '为这个关卡命名：',
+      deleteWord: '删除', deleteCustomConfirm: '删除这个关卡吗？', saved: '已保存！',
+      keyboardHint: '键盘：Tab 选择车辆，方向键移动。',
+      share: '分享', linkCopied: '链接已复制！', install: '安装应用',
+      customBadge: '自定义', dailyBadge: '每日', randomBadge: '随机',
+    },
   };
 
   // Native language names for the language picker.
-  const NAMES = { de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano', pt: 'Português', nl: 'Nederlands', pl: 'Polski' };
+  const NAMES = { de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano', pt: 'Português', nl: 'Nederlands', pl: 'Polski', zh: '中文' };
 
   let lang = 'de';
 
