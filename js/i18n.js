@@ -501,6 +501,26 @@
     },
   };
 
+  // Donation / "tip" strings, merged into every language.
+  const TIP = {
+    de: { donate: 'Trinkgeld', supportDev: 'Entwickler unterstützen', tipTitle: 'Gefällt dir Parkplatz?', tipText: 'Wenn dir das Spiel gefällt, freue ich mich über ein kleines Trinkgeld.', tipSend: 'Trinkgeld senden', tipLater: 'Vielleicht später' },
+    en: { donate: 'Tip', supportDev: 'Support the developer', tipTitle: 'Enjoying Parkplatz?', tipText: 'If you like the game, a small tip would make my day.', tipSend: 'Send a tip', tipLater: 'Maybe later' },
+    es: { donate: 'Propina', supportDev: 'Apoyar al desarrollador', tipTitle: '¿Te gusta Parkplatz?', tipText: 'Si te gusta el juego, una pequeña propina me haría muy feliz.', tipSend: 'Enviar propina', tipLater: 'Quizás más tarde' },
+    fr: { donate: 'Pourboire', supportDev: 'Soutenir le développeur', tipTitle: 'Parkplatz te plaît ?', tipText: 'Si tu aimes le jeu, un petit pourboire me ferait très plaisir.', tipSend: 'Envoyer un pourboire', tipLater: 'Plus tard' },
+    it: { donate: 'Mancia', supportDev: 'Sostieni lo sviluppatore', tipTitle: 'Ti piace Parkplatz?', tipText: 'Se il gioco ti piace, una piccola mancia mi farebbe felice.', tipSend: 'Invia una mancia', tipLater: 'Forse più tardi' },
+    pt: { donate: 'Gorjeta', supportDev: 'Apoiar o programador', tipTitle: 'Gostas do Parkplatz?', tipText: 'Se gostas do jogo, uma pequena gorjeta faria o meu dia.', tipSend: 'Enviar gorjeta', tipLater: 'Talvez mais tarde' },
+    nl: { donate: 'Fooi', supportDev: 'Steun de ontwikkelaar', tipTitle: 'Vind je Parkplatz leuk?', tipText: 'Als je het spel leuk vindt, maak je me blij met een kleine fooi.', tipSend: 'Fooi sturen', tipLater: 'Misschien later' },
+    pl: { donate: 'Napiwek', supportDev: 'Wesprzyj twórcę', tipTitle: 'Podoba Ci się Parkplatz?', tipText: 'Jeśli gra Ci się podoba, mały napiwek sprawi mi radość.', tipSend: 'Wyślij napiwek', tipLater: 'Może później' },
+    zh: { donate: '打赏', supportDev: '支持开发者', tipTitle: '喜欢《Parkplatz》吗？', tipText: '如果你喜欢这款游戏，欢迎请我喝杯咖啡。', tipSend: '打赏', tipLater: '以后再说' },
+    'zh-Hant': { donate: '打賞', supportDev: '支持開發者', tipTitle: '喜歡《Parkplatz》嗎？', tipText: '如果你喜歡這款遊戲，歡迎請我喝杯咖啡。', tipSend: '打賞', tipLater: '以後再說' },
+    ja: { donate: 'チップ', supportDev: '開発者を支援', tipTitle: 'Parkplatzは楽しいですか？', tipText: 'ゲームを気に入っていただけたら、少しのチップが励みになります。', tipSend: 'チップを送る', tipLater: 'あとで' },
+    ar: { donate: 'إكرامية', supportDev: 'ادعم المطوّر', tipTitle: 'هل تستمتع بـ Parkplatz؟', tipText: 'إذا أعجبتك اللعبة، فإن إكرامية صغيرة ستسعدني كثيرًا.', tipSend: 'أرسل إكرامية', tipLater: 'ربما لاحقًا' },
+    ko: { donate: '후원', supportDev: '개발자 응원하기', tipTitle: 'Parkplatz가 마음에 드세요?', tipText: '게임이 마음에 드셨다면 작은 후원이 큰 힘이 됩니다.', tipSend: '후원하기', tipLater: '나중에' },
+    ru: { donate: 'Чаевые', supportDev: 'Поддержать разработчика', tipTitle: 'Нравится Parkplatz?', tipText: 'Если игра вам нравится, небольшие чаевые меня порадуют.', tipSend: 'Оставить чаевые', tipLater: 'Может, позже' },
+    tr: { donate: 'Bahşiş', supportDev: 'Geliştiriciyi destekle', tipTitle: 'Parkplatz’ı beğendin mi?', tipText: 'Oyunu beğendiysen küçük bir bahşiş beni çok mutlu eder.', tipSend: 'Bahşiş gönder', tipLater: 'Belki sonra' },
+  };
+  Object.keys(TIP).forEach((l) => { if (STRINGS[l]) Object.assign(STRINGS[l], TIP[l]); });
+
   // Native language names for the language picker.
   const NAMES = {
     de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano',
