@@ -1,0 +1,9 @@
+{
+  "appId": "de.tommywurzbacher.parkplatz",
+  "appName": "Parkplatz",
+  "webDir": "www",
+  "backgroundColor": "#141a26",
+  "android": {
+    "backgroundColor": "#141a26"
+  }
+}

@@ -28,3 +28,15 @@ tmp/
 .env.*
 *.pem
 secrets.*
+
+# Android / Capacitor (generated at build time)
+www/
+android/
+.gradle/
+.dockerhome/
+key.properties
+*.jks
+*.keystore
+
+# Capacitor asset-generator intermediate output
+resources/android/
