@@ -521,6 +521,26 @@
   };
   Object.keys(TIP).forEach((l) => { if (STRINGS[l]) Object.assign(STRINGS[l], TIP[l]); });
 
+  // "Recommend the app" strings, merged into every language.
+  const SHARE = {
+    de: { recommend: 'App weiterempfehlen', shareAppText: 'Ich spiele Parkplatz – ein kniffliges Schiebe-Puzzle. Probier es aus!' },
+    en: { recommend: 'Recommend app', shareAppText: "I'm playing Parkplatz – a clever sliding-block puzzle. Give it a try!" },
+    es: { recommend: 'Recomendar la app', shareAppText: 'Estoy jugando a Parkplatz, un ingenioso puzle deslizante. ¡Pruébalo!' },
+    fr: { recommend: 'Recommander l’appli', shareAppText: 'Je joue à Parkplatz, un casse-tête coulissant malin. Essaie-le !' },
+    it: { recommend: 'Consiglia l’app', shareAppText: 'Sto giocando a Parkplatz, un rompicapo a incastro. Provalo!' },
+    pt: { recommend: 'Recomendar a app', shareAppText: 'Estou a jogar Parkplatz, um puzzle deslizante engenhoso. Experimenta!' },
+    nl: { recommend: 'App aanbevelen', shareAppText: 'Ik speel Parkplatz, een slimme schuifpuzzel. Probeer het!' },
+    pl: { recommend: 'Poleć aplikację', shareAppText: 'Gram w Parkplatz – sprytną łamigłówkę przesuwną. Wypróbuj!' },
+    zh: { recommend: '推荐这款应用', shareAppText: '我在玩《Parkplatz》——一款巧妙的滑块解谜游戏，快来试试！' },
+    'zh-Hant': { recommend: '推薦這款應用', shareAppText: '我在玩《Parkplatz》——一款巧妙的滑塊解謎遊戲，快來試試！' },
+    ja: { recommend: 'アプリを紹介', shareAppText: 'スライドパズル「Parkplatz」で遊んでいます。ぜひ試してみて！' },
+    ar: { recommend: 'أوصِ بالتطبيق', shareAppText: 'ألعب Parkplatz، أحجية انزلاقية ذكية. جرّبها!' },
+    ko: { recommend: '앱 추천하기', shareAppText: '슬라이드 퍼즐 Parkplatz를 하고 있어요. 한번 해보세요!' },
+    ru: { recommend: 'Порекомендовать', shareAppText: 'Играю в Parkplatz — умную головоломку-пятнашки. Попробуй!' },
+    tr: { recommend: 'Uygulamayı öner', shareAppText: 'Parkplatz oynuyorum – zekice bir kaydırma bulmacası. Sen de dene!' },
+  };
+  Object.keys(SHARE).forEach((l) => { if (STRINGS[l]) Object.assign(STRINGS[l], SHARE[l]); });
+
   // Native language names for the language picker.
   const NAMES = {
     de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano',

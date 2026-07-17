@@ -26,6 +26,9 @@
     '#f97316', '#84cc16', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#22c55e'];
 
   const PAYPAL_URL = 'https://www.paypal.com/paypalme/TommyWurzbacher';
+  // App link used by "recommend the app". After the Play Store release you can
+  // switch this to the Play listing URL.
+  const APP_URL = 'https://laserrapt0r.github.io/Parkplatz/';
   const TIP_AFTER_LEVELS = 10; // show the donation prompt once after this many campaign solves
 
   const THEMES = {
@@ -659,6 +662,12 @@
     if (navigator.share) { navigator.share(data).catch(() => {}); return; }
     copyText(url);
   }
+  // Recommend the whole app (localized message + app link).
+  function shareApp() {
+    const text = I18n.t('shareAppText');
+    if (navigator.share) { navigator.share({ title: 'Parkplatz', text, url: APP_URL }).catch(() => {}); return; }
+    copyText(text + ' ' + APP_URL);
+  }
   function copyText(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => toast(I18n.t('linkCopied'))).catch(() => fallbackCopy(text));
@@ -695,7 +704,10 @@
     setTimeout(() => {
       let p = window.PuzzleGen ? PuzzleGen.randomPuzzle(diff) : null;
       const R = PuzzleGen ? PuzzleGen.RANGE[diff] : null;
-      if (!p || (R && (p.minMoves < R[0] || p.minMoves > R[1]))) p = randomCampaignOfTier(diff);
+      // Accept a fresh puzzle unless it's clearly too easy for the tier (harder
+      // than the band is fine). Only then fall back to a campaign puzzle. This
+      // keeps random puzzles fresh instead of repeating campaign levels.
+      if (!p || (R && p.minMoves < R[0] - 3)) p = randomCampaignOfTier(diff);
       showSpinner(false);
       loadPuzzle(p, { source: 'random' });
     }, 30);
@@ -922,6 +934,10 @@
       else setScreen('menu');
       maybeShowTip();
     });
+
+    // recommend the app
+    $('btn-share-app').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); shareApp(); });
+    $('btn-share-app-2').addEventListener('click', () => { Sfx.click(); shareApp(); });
 
     // donation / tip
     $('btn-donate').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); openDonate(); });
