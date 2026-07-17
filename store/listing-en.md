@@ -13,13 +13,13 @@ Parkplatz is a relaxing yet brain-teasing sliding-block puzzle in the spirit of
 cars, buses, trucks and motorcycles out of the way until the path to the exit is
 clear.
 
-100 hand-verified levels across four difficulty tiers – from easy to very hard,
+100 hand-verified levels across five difficulty tiers – from easy to extreme,
 and never dull. Every level's minimum number of moves is known: match it and you
 earn all three stars!
 
 ★ FEATURES
 • 100 unique, guaranteed-solvable puzzles
-• Four difficulty tiers with a smoothly rising challenge
+• Five difficulty tiers (up to “Extreme”) with a smoothly rising challenge
 • 3-star rating – go for the perfect run
 • Level editor: build your own puzzles with a live solvability check
 • Daily puzzle – a fresh one every day, the same for everyone

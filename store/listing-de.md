@@ -13,13 +13,13 @@ von „Rush Hour": Der Parkplatz ist zugeparkt und dein rotes Auto muss raus!
 Verschiebe Autos, Busse, LKWs und Motorräder geschickt zur Seite, bis der Weg
 zur Ausfahrt frei ist.
 
-100 handgeprüfte Level in vier Schwierigkeitsstufen – von leicht bis sehr
+100 handgeprüfte Level in fünf Schwierigkeitsstufen – von leicht bis extrem
 schwer, aber keines davon langweilig. Für jedes Level ist die minimale Zugzahl
 bekannt: Schaffst du es mit den wenigsten Zügen, gibt es drei Sterne!
 
 ★ FUNKTIONEN
 • 100 einzigartige, garantiert lösbare Rätsel
-• Vier Schwierigkeitsstufen mit sanft steigender Herausforderung
+• Fünf Schwierigkeitsstufen (bis „Extrem“) mit sanft steigender Herausforderung
 • 3-Sterne-Bewertung – hol dir das perfekte Ergebnis
 • Level-Editor: Baue eigene Rätsel mit Live-Lösbarkeitsprüfung
 • Tägliches Rätsel – jeden Tag ein neues, für alle gleich
