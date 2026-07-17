@@ -25,6 +25,9 @@
   const VEH_PALETTE = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4',
     '#f97316', '#84cc16', '#ec4899', '#14b8a6', '#eab308', '#6366f1', '#22c55e'];
 
+  const PAYPAL_URL = 'https://www.paypal.com/paypalme/TommyWurzbacher';
+  const TIP_AFTER_LEVELS = 10; // show the donation prompt once after this many campaign solves
+
   const THEMES = {
     tag: { bgTop: '#2c333f', bgBot: '#232a34', lotTop: '#3a4150', lotBot: '#333a48', wall: '#c9ced8', line: 'rgba(255,255,255,0.16)', exit: '120,230,150', speckle: '0,0,0' },
     nacht: { bgTop: '#10141d', bgBot: '#0b0e15', lotTop: '#1b2230', lotBot: '#161c28', wall: '#737d92', line: 'rgba(255,255,255,0.10)', exit: '87,224,142', speckle: '0,0,0' },
@@ -72,6 +75,7 @@
   let slideCtx = null;         // { index, dir } for merged keyboard slides
 
   let particles = [];
+  let pendingTip = false;      // show donation prompt after the current win closes
 
   // editor state
   let editVehicles = [];
@@ -312,6 +316,7 @@
     phase = 'won';
     const stars = computeStars(moves);
     recordResult(stars, moves);
+    if (ctxSource.source === 'campaign' && !Storage.tipShown && Storage.totals().solved >= TIP_AFTER_LEVELS) pendingTip = true;
     if (!reduceMotion) spawnConfetti();
     showWin(stars);
     refreshMenuProgress();
@@ -848,6 +853,19 @@
   let toastTimer = null;
   function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
 
+  // ---------------------------------------------------------------- donation / tip
+  function openDonate() {
+    // opens the system browser (web: new tab, Capacitor: external browser)
+    try { window.open(PAYPAL_URL, '_blank', 'noopener'); } catch (e) { location.href = PAYPAL_URL; }
+  }
+  function showTip() { $('overlay-tip').classList.add('show'); Storage.setTipShown(true); }
+  function hideTip() { $('overlay-tip').classList.remove('show'); }
+  function maybeShowTip() {
+    if (!pendingTip) return;
+    pendingTip = false;
+    setTimeout(showTip, reduceMotion ? 0 : 400);
+  }
+
   // ---------------------------------------------------------------- sound button
   function updateSoundBtn() { $('btn-sound').classList.toggle('muted', !Sfx.enabled); }
 
@@ -893,8 +911,8 @@
     $('btn-hint').addEventListener('click', doHint);
 
     // win overlay
-    $('btn-win-retry').addEventListener('click', () => { Sfx.click(); hideWin(); loadPuzzle(level, ctxSource); });
-    $('btn-win-levels').addEventListener('click', () => { Sfx.click(); hideWin(); setScreen('menu'); });
+    $('btn-win-retry').addEventListener('click', () => { Sfx.click(); hideWin(); loadPuzzle(level, ctxSource); maybeShowTip(); });
+    $('btn-win-levels').addEventListener('click', () => { Sfx.click(); hideWin(); setScreen('menu'); maybeShowTip(); });
     $('btn-win-next').addEventListener('click', () => {
       Sfx.click(); hideWin();
       const s = ctxSource.source;
@@ -902,7 +920,15 @@
       else if (s === 'random') startRandom(level.difficulty || 'mittel');
       else if (s === 'test') setScreen('editor');
       else setScreen('menu');
+      maybeShowTip();
     });
+
+    // donation / tip
+    $('btn-donate').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); openDonate(); });
+    $('btn-support').addEventListener('click', () => { Sfx.click(); openDonate(); });
+    $('btn-tip-send').addEventListener('click', () => { Sfx.click(); openDonate(); hideTip(); });
+    $('btn-tip-later').addEventListener('click', () => { Sfx.click(); hideTip(); });
+    $('overlay-tip').addEventListener('click', (e) => { if (e.target === $('overlay-tip')) hideTip(); });
 
     // editor
     document.querySelectorAll('#editor-tools .tool[data-tool]').forEach((b) => b.addEventListener('click', () => {

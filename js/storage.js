@@ -14,6 +14,7 @@
     theme: 'tag',          // 'tag' | 'nacht' | 'neon'
     reduceMotion: 'auto',  // 'auto' | 'on' | 'off'
     gating: true,          // star-gating of tiers
+    tipShown: false,       // one-time donation prompt shown?
     progress: {},          // { [levelId]: { stars, bestMoves } }
     daily: {},             // { [YYYY-MM-DD]: { stars, moves } }
     dailyPuzzles: {},      // { [YYYY-MM-DD]: puzzleObject }  (cache)
@@ -59,6 +60,8 @@
     setReduceMotion(v) { state.reduceMotion = v; persist(); },
     get gating() { return state.gating; },
     setGating(on) { state.gating = !!on; persist(); },
+    get tipShown() { return state.tipShown; },
+    setTipShown(v) { state.tipShown = !!v; persist(); },
 
     // ---- campaign progress ----
     getLevel(id) { return state.progress[id] || null; },
