@@ -146,6 +146,8 @@
     else if (s === 'random') { el.textContent = I18n.t('randomBadge'); val.textContent = I18n.t(level.difficulty || 'mittel'); }
     else if (s === 'custom') { el.textContent = I18n.t('customBadge'); val.textContent = ctxSource.name || ''; }
     else { el.textContent = I18n.t('test'); val.textContent = ''; }
+    // sharing only makes sense for stable links (campaign / daily)
+    $('btn-share').style.display = (s === 'campaign' || s === 'daily') ? '' : 'none';
   }
 
   // ---------------------------------------------------------------- geometry
@@ -641,6 +643,32 @@
     hint = res;
   }
 
+  // ---------------------------------------------------------------- share
+  function shareLink() {
+    const s = ctxSource.source;
+    let url = location.origin + location.pathname.replace(/index\.html$/, '');
+    if (s === 'campaign') url += '?level=' + level.id;
+    else if (s === 'daily') url += '?daily';
+    else return;
+    const data = { title: 'Parkplatz', text: I18n.t('tagline'), url };
+    if (navigator.share) { navigator.share(data).catch(() => {}); return; }
+    copyText(url);
+  }
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => toast(I18n.t('linkCopied'))).catch(() => fallbackCopy(text));
+    } else fallbackCopy(text);
+  }
+  function fallbackCopy(text) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      toast(I18n.t('linkCopied'));
+    } catch (e) { toast(text); }
+  }
+
   // ---------------------------------------------------------------- daily / random
   function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function startDaily() {
@@ -794,8 +822,18 @@
     const g = $(groupId); if (!g) return;
     g.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.getAttribute('data-val') === String(val)));
   }
+  function buildLangSelect() {
+    const sel = $('set-lang'); if (!sel) return;
+    sel.innerHTML = '';
+    I18n.available.forEach((code) => {
+      const o = document.createElement('option');
+      o.value = code; o.textContent = I18n.name(code);
+      sel.appendChild(o);
+    });
+    sel.value = I18n.lang;
+  }
   function syncSettingsUI() {
-    segSelect('set-lang', I18n.lang);
+    if ($('set-lang')) $('set-lang').value = I18n.lang;
     segSelect('set-sound', Storage.soundOn ? 1 : 0);
     segSelect('set-music', Storage.musicOn ? 1 : 0);
     segSelect('set-theme', Storage.theme);
@@ -818,8 +856,10 @@
   function init() {
     // language
     let lang = Storage.lang;
-    if (!lang) { lang = (navigator.language || 'de').toLowerCase().startsWith('de') ? 'de' : 'en'; Storage.setLang(lang); }
+    if (!lang) { lang = I18n.detect(navigator.language); Storage.setLang(lang); }
+    if (!I18n.available.includes(lang)) lang = 'en';
     I18n.set(lang);
+    buildLangSelect();
 
     colorblind = Storage.colorblind;
     applyTheme(Storage.theme);
@@ -837,6 +877,7 @@
     $('btn-howto-close').addEventListener('click', () => { Sfx.click(); $('overlay-howto').classList.remove('show'); });
     $('btn-settings-top').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); setScreen('settings'); });
     $('btn-back').addEventListener('click', () => { Sfx.click(); backFromGame(); });
+    $('btn-share').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); shareLink(); });
 
     // random difficulty buttons
     document.querySelectorAll('.diff-btn').forEach((b) => b.addEventListener('click', () => { Sfx.unlock(); Sfx.click(); startRandom(b.getAttribute('data-diff')); }));
@@ -878,7 +919,7 @@
     $('btn-ed-save').addEventListener('click', () => { Sfx.click(); editorSave(); });
 
     // settings wiring
-    wireSeg('set-lang', (v) => { I18n.set(v); Storage.setLang(v); syncSettingsUI(); });
+    $('set-lang').addEventListener('change', (e) => { Sfx.unlock(); Sfx.click(); const v = e.target.value; I18n.set(v); Storage.setLang(v); });
     wireSeg('set-sound', (v) => { const on = v === '1'; Sfx.setEnabled(on); Storage.setSound(on); updateSoundBtn(); });
     wireSeg('set-music', (v) => { const on = v === '1'; Storage.setMusic(on); Sfx.unlock(); Sfx.setMusicEnabled(on); });
     wireSeg('set-theme', (v) => { Storage.setTheme(v); applyTheme(v); });

@@ -85,9 +85,7 @@
       <div class="settings-list">
         <div class="set-row">
           <span class="set-label" data-i18n="language">Sprache</span>
-          <div class="seg" id="set-lang">
-            <button data-val="de">DE</button><button data-val="en">EN</button>
-          </div>
+          <select class="lang-select" id="set-lang" aria-label="Language"></select>
         </div>
         <div class="set-row">
           <span class="set-label" data-i18n="soundLabel">Soundeffekte</span>
@@ -167,6 +165,9 @@
     <section id="screen-game" class="screen">
       <div class="game-hud">
         <button id="btn-back" class="btn btn-ghost btn-sm" data-i18n="levelsShort">Level</button>
+        <button id="btn-share" class="icon-btn hud-share" title="Share" aria-label="Share">
+          <svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2.4 1.2l-6.1-3.1a3 3 0 0 0 0-2.2l6.1-3.1A3 3 0 1 0 15 6l-6.1 3.1a3 3 0 1 0 0 5.8L15 18a3 3 0 1 0 3-2z"/></svg>
+        </button>
         <div class="hud-info">
           <div class="hud-item">
             <span class="hud-label" id="hud-mode-label" data-i18n="levelWord">Level</span>

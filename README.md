@@ -8,6 +8,15 @@ music — all offline and installable as an app.
 
 **No build step, no dependencies, no internet.** Just open `index.html`.
 
+<p align="center">
+  <img src="screenshots/board.png" alt="Parkplatz gameplay – clear a path for the red car" width="300" />
+</p>
+<p align="center">
+  <img src="screenshots/menu.png" alt="Main menu" width="235" />
+  &nbsp;&nbsp;
+  <img src="screenshots/editor.png" alt="Level editor with live solvability check" width="235" />
+</p>
+
 ## ▶️ Play online
 
 **→ [https://laserrapt0r.github.io/Parkplatz/](https://laserrapt0r.github.io/Parkplatz/)**
@@ -57,7 +66,8 @@ thanks to a service worker that caches the whole game.
 ### Accessibility & options
 - **Colorblind mode** — adds distinct patterns to vehicles on top of color.
 - **Reduced motion** — respects `prefers-reduced-motion` (Auto/Reduced/Full).
-- **Bilingual UI:** German and English, auto-detected and switchable any time.
+- **8 languages:** German, English, Spanish, French, Italian, Portuguese, Dutch
+  and Polish — auto-detected and switchable any time.
 - **Settings screen:** language, SFX & music volume, theme, colorblind, motion,
   star gating and a progress reset.
 
@@ -69,8 +79,9 @@ thanks to a service worker that caches the whole game.
 ### Other
 - **Progress saved** in your browser (`localStorage`): stars, best moves,
   settings, daily results and custom levels.
-- **Shareable links:** each campaign level has a deep link
-  (`?level=42`); `?daily` and `?random=schwer` also work.
+- **Shareable links:** an in-game **Share** button copies (or shares, via the
+  Web Share API) a deep link to the current level. Campaign levels use
+  `?level=42`; `?daily` and `?random=schwer` also work.
 - **Undo**, **Restart** and an optimal-move **Hint** (solved live in the browser).
 
 ---
