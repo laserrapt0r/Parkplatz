@@ -17,15 +17,15 @@
     };
   }
 
-  const RANGE = { leicht: [6, 9], mittel: [10, 15], schwer: [16, 21], sehr_schwer: [22, 32] };
-  const FILLERS = { leicht: [4, 6], mittel: [6, 9], schwer: [8, 11], sehr_schwer: [10, 13] };
-  const SOLVE_CAP = { leicht: 40000, mittel: 60000, schwer: 90000, sehr_schwer: 150000 };
-  const MAX_ATTEMPTS = { leicht: 120, mittel: 160, schwer: 240, sehr_schwer: 400 };
+  const RANGE = { leicht: [6, 9], mittel: [10, 15], schwer: [16, 20], sehr_schwer: [21, 25], extrem: [24, 40] };
+  const FILLERS = { leicht: [4, 6], mittel: [6, 9], schwer: [8, 11], sehr_schwer: [10, 13], extrem: [11, 14] };
+  const SOLVE_CAP = { leicht: 40000, mittel: 60000 };
+  const MAX_ATTEMPTS = { leicht: 120, mittel: 160 };
   // Hard tiers use graph-harvesting (a deep component reliably contains states
   // at high move-counts), so fresh hard puzzles are produced without falling
   // back to the campaign.
-  const HARVEST_CAP = { schwer: 55000, sehr_schwer: 110000 };
-  const HARVEST_SEEDS = { schwer: 40, sehr_schwer: 55 };
+  const HARVEST_CAP = { schwer: 55000, sehr_schwer: 110000, extrem: 150000 };
+  const HARVEST_SEEDS = { schwer: 40, sehr_schwer: 55, extrem: 70 };
 
   function lenForType(t) { return t === 'moto' ? 1 : t === 'car' ? 2 : 3; }
   function pickType(rnd) {
@@ -173,7 +173,7 @@
   // Deterministic when `rnd` is a seeded RNG and `timeMs` is 0 (Daily puzzle).
   function generate(diff, rnd, timeMs) {
     rnd = rnd || Math.random;
-    if (diff === 'schwer' || diff === 'sehr_schwer') return generateHard(diff, rnd, timeMs);
+    if (diff === 'schwer' || diff === 'sehr_schwer' || diff === 'extrem') return generateHard(diff, rnd, timeMs);
     const range = RANGE[diff] || RANGE.mittel;
     const fr = FILLERS[diff] || FILLERS.mittel;
     const cap = SOLVE_CAP[diff] || 60000;
@@ -196,7 +196,7 @@
   // Best-effort fresh puzzle within a snug interactive budget. The caller
   // (Random mode) falls back to a campaign puzzle of the tier if the result is
   // out of range, so this stays fast rather than exhaustive.
-  function randomPuzzle(diff) { return generate(diff, Math.random, diff === 'sehr_schwer' ? 4000 : diff === 'schwer' ? 2600 : 1200); }
+  function randomPuzzle(diff) { return generate(diff, Math.random, diff === 'extrem' ? 5000 : diff === 'sehr_schwer' ? 4000 : diff === 'schwer' ? 2600 : 1200); }
 
   // Difficulty of the daily puzzle rotates by weekday so it isn't always the
   // same challenge (deterministic from the date).

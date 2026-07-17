@@ -541,6 +541,26 @@
   };
   Object.keys(SHARE).forEach((l) => { if (STRINGS[l]) Object.assign(STRINGS[l], SHARE[l]); });
 
+  // 5th tier "Extrem" + the new sequential-unlock wording (overrides gatingLabel).
+  const TIER5 = {
+    de: { extrem: 'Extrem', gatingLabel: 'Level nacheinander freischalten', needPrev: 'Vorheriges Level zuerst lösen', back: 'Zurück' },
+    en: { extrem: 'Extreme', gatingLabel: 'Unlock levels one by one', needPrev: 'Solve the previous level first', back: 'Back' },
+    es: { extrem: 'Extremo', gatingLabel: 'Desbloquear niveles uno a uno', needPrev: 'Resuelve antes el nivel anterior', back: 'Atrás' },
+    fr: { extrem: 'Extrême', gatingLabel: 'Débloquer les niveaux un par un', needPrev: 'Résous d’abord le niveau précédent', back: 'Retour' },
+    it: { extrem: 'Estremo', gatingLabel: 'Sblocca i livelli uno alla volta', needPrev: 'Prima risolvi il livello precedente', back: 'Indietro' },
+    pt: { extrem: 'Extremo', gatingLabel: 'Desbloquear níveis um a um', needPrev: 'Resolve primeiro o nível anterior', back: 'Voltar' },
+    nl: { extrem: 'Extreem', gatingLabel: 'Levels één voor één ontgrendelen', needPrev: 'Los eerst het vorige level op', back: 'Terug' },
+    pl: { extrem: 'Ekstremalny', gatingLabel: 'Odblokowuj poziomy po kolei', needPrev: 'Najpierw ukończ poprzedni poziom', back: 'Wstecz' },
+    zh: { extrem: '极难', gatingLabel: '逐关解锁', needPrev: '请先完成上一关', back: '返回' },
+    'zh-Hant': { extrem: '極難', gatingLabel: '逐關解鎖', needPrev: '請先完成上一關', back: '返回' },
+    ja: { extrem: '超難問', gatingLabel: 'レベルを順番に解放', needPrev: '前のレベルを先にクリア', back: '戻る' },
+    ar: { extrem: 'شديد الصعوبة', gatingLabel: 'فتح المستويات واحدًا تلو الآخر', needPrev: 'أكمل المستوى السابق أولًا', back: 'رجوع' },
+    ko: { extrem: '최상급', gatingLabel: '레벨을 순서대로 잠금 해제', needPrev: '이전 레벨을 먼저 해결하세요', back: '뒤로' },
+    ru: { extrem: 'Экстрим', gatingLabel: 'Открывать уровни по порядку', needPrev: 'Сначала пройдите предыдущий уровень', back: 'Назад' },
+    tr: { extrem: 'Aşırı zor', gatingLabel: 'Bölümleri sırayla aç', needPrev: 'Önce önceki bölümü çöz', back: 'Geri' },
+  };
+  Object.keys(TIER5).forEach((l) => { if (STRINGS[l]) Object.assign(STRINGS[l], TIER5[l]); });
+
   // Native language names for the language picker.
   const NAMES = {
     de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano',

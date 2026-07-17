@@ -79,13 +79,17 @@
           <button class="btn diff-btn" data-diff="mittel" data-i18n="mittel" style="--accent:#f2b134">Mittel</button>
           <button class="btn diff-btn" data-diff="schwer" data-i18n="schwer" style="--accent:#f2724b">Schwer</button>
           <button class="btn diff-btn" data-diff="sehr_schwer" data-i18n="sehr_schwer" style="--accent:#b45cf0">Sehr schwer</button>
+          <button class="btn diff-btn" data-diff="extrem" data-i18n="extrem" style="--accent:#e11d48">Extrem</button>
         </div>
       </div>
     </section>
 
     <!-- Settings screen -->
     <section id="screen-settings" class="screen">
-      <div class="levels-head"><h2 data-i18n="settings">Einstellungen</h2></div>
+      <div class="levels-head settings-head">
+        <button id="btn-settings-back" class="btn btn-ghost btn-sm">‹ <span data-i18n="back">Zurück</span></button>
+        <h2 data-i18n="settings">Einstellungen</h2>
+      </div>
       <div class="settings-list">
         <div class="set-row">
           <span class="set-label" data-i18n="language">Sprache</span>

@@ -2,7 +2,7 @@
 
 A sliding-block traffic puzzle in the spirit of *Rush Hour*, built as a single
 self-contained HTML5 game. Clear a path for the red car so it can drive out of
-the crowded parking lot. **100 hand-verified puzzles** across four difficulty
+the crowded parking lot. **100 hand-verified puzzles** across five difficulty
 tiers, plus a level editor, a daily challenge, random puzzles, themes, sound and
 music — all offline and installable as an app.
 
@@ -36,8 +36,9 @@ thanks to a service worker that caches the whole game.
 ## Features
 
 ### Game modes
-- **Campaign** — 100 unique puzzles across four tiers (*Easy · Medium · Hard ·
-  Very hard*). None trivial; difficulty ramps smoothly from 6 to 33 minimum moves.
+- **Campaign** — 100 unique puzzles across five tiers (*Easy · Medium · Hard ·
+  Very hard · Extreme*). None trivial; difficulty ramps smoothly from 6 to 31
+  minimum moves.
 - **Daily puzzle** — a fresh, deterministic puzzle generated from the date, the
   same for everyone on a given day.
 - **Random puzzle** — generate a fresh puzzle in the browser at your chosen
@@ -103,12 +104,17 @@ thanks to a service worker that caches the whole game.
 Difficulty is measured by the minimum number of moves (a *move* = sliding one
 vehicle any distance in a single direction — the classic Rush Hour convention).
 
-| Tier       | Levels | Typical minimum moves |
-|------------|--------|-----------------------|
-| Easy       | 1–25   | ~6–10                 |
-| Medium     | 26–50  | ~10–16                |
-| Hard       | 51–75  | ~17–22                |
-| Very hard  | 76–100 | ~22–33                |
+| Tier       | Levels  | Typical minimum moves |
+|------------|---------|-----------------------|
+| Easy       | 1–15    | ~6–9                  |
+| Medium     | 16–40   | ~9–16                 |
+| Hard       | 41–65   | ~16–20                |
+| Very hard  | 66–85   | ~20–23                |
+| Extreme    | 86–100  | ~23–31                |
+
+Within each tier the first level is unlocked; solving a level unlocks the next
+one in that tier (can be turned off in Settings). The **Hint** is disabled on
+*Very hard* and *Extreme* — a pure challenge.
 
 ### Star rating
 

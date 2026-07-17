@@ -10,10 +10,10 @@
   const byId = {};
   PUZZLES.forEach((p) => { byId[p.id] = p; });
 
-  const TIERS = ['leicht', 'mittel', 'schwer', 'sehr_schwer'];
-  const TIER_ACCENT = { leicht: '#37c978', mittel: '#f2b134', schwer: '#f2724b', sehr_schwer: '#b45cf0' };
-  // total campaign stars required to unlock each tier
-  const GATE = { leicht: 0, mittel: 18, schwer: 45, sehr_schwer: 80 };
+  const TIERS = ['leicht', 'mittel', 'schwer', 'sehr_schwer', 'extrem'];
+  const TIER_ACCENT = { leicht: '#37c978', mittel: '#f2b134', schwer: '#f2724b', sehr_schwer: '#b45cf0', extrem: '#e11d48' };
+  // hint is disabled on these tiers (pure challenge)
+  const NO_HINT = { sehr_schwer: true, extrem: true };
 
   // ---------------------------------------------------------------- layout (cell units)
   const N = 6, EXIT_ROW = 2;
@@ -79,6 +79,7 @@
 
   let particles = [];
   let pendingTip = false;      // show donation prompt after the current win closes
+  let settingsReturn = 'menu'; // screen to return to when leaving Settings
 
   // editor state
   let editVehicles = [];
@@ -155,6 +156,10 @@
     else { el.textContent = I18n.t('test'); val.textContent = ''; }
     // sharing only makes sense for stable links (campaign / daily)
     $('btn-share').style.display = (s === 'campaign' || s === 'daily') ? '' : 'none';
+    // hint is disabled on the hardest tiers (pure challenge)
+    const noHint = !!(level && NO_HINT[level.difficulty]);
+    $('btn-hint').disabled = noHint;
+    $('btn-hint').classList.toggle('is-off', noHint);
   }
 
   // ---------------------------------------------------------------- geometry
@@ -583,24 +588,24 @@
     if (name !== 'game' && name !== 'editor') mode = 'none';
     sizeFx();
   }
+  function activeScreen() { return Object.keys(screens).find((k) => screens[k].classList.contains('active')) || 'menu'; }
   function refreshMenuProgress() { const t = Storage.totals(); $('menu-solved').textContent = t.solved; $('menu-stars').textContent = t.stars; }
 
   // ---------------------------------------------------------------- level select (with gating)
   function buildLevelSelect() {
     const cont = $('levels-container'); cont.innerHTML = '';
-    const totalStars = Storage.totals().stars;
     TIERS.forEach((tier) => {
-      const puzzles = PUZZLES.filter((p) => p.difficulty === tier);
-      const unlocked = !Storage.gating || totalStars >= GATE[tier];
+      const puzzles = PUZZLES.filter((p) => p.difficulty === tier); // ascending id within tier
       let solved = 0; puzzles.forEach((p) => { if (Storage.getLevel(p.id)) solved++; });
       const section = document.createElement('div'); section.className = 'tier-section';
       const head = document.createElement('div'); head.className = 'tier-head'; head.style.setProperty('--accent', TIER_ACCENT[tier]);
-      head.innerHTML = `<span class="tier-dot"></span><span class="tier-name">${I18n.t(tier)}</span>` +
-        (unlocked ? `<span class="tier-count">${solved}/${puzzles.length}</span>` : `<span class="tier-count locked-note">🔒 ${I18n.t('needStars').replace('{n}', GATE[tier])}</span>`);
+      head.innerHTML = `<span class="tier-dot"></span><span class="tier-name">${I18n.t(tier)}</span><span class="tier-count">${solved}/${puzzles.length}</span>`;
       section.appendChild(head);
       const grid = document.createElement('div'); grid.className = 'level-grid';
-      puzzles.forEach((p) => {
+      puzzles.forEach((p, idx) => {
         const rec = Storage.getLevel(p.id);
+        // sequential unlock within the tier: first level free, next unlocks after solving the previous
+        const unlocked = !Storage.gating || idx === 0 || !!Storage.getLevel(puzzles[idx - 1].id);
         const btn = document.createElement('button');
         btn.className = 'level-btn' + (rec ? ' done' : '') + (unlocked ? '' : ' locked');
         btn.style.setProperty('--accent', TIER_ACCENT[tier]);
@@ -608,7 +613,7 @@
         let sh = '<span class="lvl-stars">'; for (let s = 0; s < 3; s++) sh += `<i class="${s < stars ? 'on' : ''}">★</i>`; sh += '</span>';
         btn.innerHTML = unlocked ? `<span class="lvl-num">${p.id}</span>${sh}` : `<span class="lvl-lock">🔒</span>`;
         if (unlocked) btn.addEventListener('click', () => { Sfx.unlock(); Sfx.click(); loadPuzzle(p, { source: 'campaign' }); });
-        else btn.addEventListener('click', () => { toast(I18n.t('needStars').replace('{n}', GATE[tier])); });
+        else btn.addEventListener('click', () => { toast(I18n.t('needPrev')); });
         grid.appendChild(btn);
       });
       section.appendChild(grid); cont.appendChild(section);
@@ -645,6 +650,7 @@
   function doRestart() { if (level) { loadPuzzle(level, ctxSource); Sfx.click(); } }
   function doHint() {
     if (mode !== 'play' || phase !== 'idle' || !level) return;
+    if (NO_HINT[level.difficulty]) return; // no hints on the hardest tiers
     Sfx.click();
     let res = null; try { res = Solver.solveNext(N, vehicles); } catch (e) { res = null; }
     if (!res) { if (targetVeh && freeRange(vehicles.indexOf(targetVeh)).max >= goalCol) hint = { index: vehicles.indexOf(targetVeh), axis: 'H', delta: 1 }; return; }
@@ -905,7 +911,8 @@
     $('btn-editor').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); if (!editVehicles.length) editorClear(); setScreen('editor'); });
     $('btn-howto').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); $('overlay-howto').classList.add('show'); });
     $('btn-howto-close').addEventListener('click', () => { Sfx.click(); $('overlay-howto').classList.remove('show'); });
-    $('btn-settings-top').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); setScreen('settings'); });
+    $('btn-settings-top').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); if (activeScreen() !== 'settings') settingsReturn = activeScreen(); setScreen('settings'); });
+    $('btn-settings-back').addEventListener('click', () => { Sfx.click(); setScreen(settingsReturn || 'menu'); });
     $('btn-back').addEventListener('click', () => { Sfx.click(); backFromGame(); });
     $('btn-share').addEventListener('click', () => { Sfx.unlock(); Sfx.click(); shareLink(); });
 
