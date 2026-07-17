@@ -218,6 +218,23 @@ function canon(vehicles) {
   return parts.join('|');
 }
 
+// Identity of the piece SET (types/orientations/lengths, ignoring positions).
+// All arrangements in one component share this — it is what makes levels look
+// and solve alike, so we cap how many levels may share it.
+function pieceKey(vehicles) {
+  return vehicles.filter((v) => !v.target).map((v) => v.type + v.orient + v.len).sort().join(',');
+}
+function occGrid(vehicles) {
+  const g = new Uint8Array(N * N);
+  for (const v of vehicles) for (let k = 0; k < v.len; k++) {
+    const r = v.orient === 'H' ? v.row : v.row + k;
+    const c = v.orient === 'H' ? v.col + k : v.col;
+    g[r * N + c] = 1;
+  }
+  return g;
+}
+function gridSim(a, b) { let s = 0; for (let i = 0; i < a.length; i++) if (a[i] === b[i]) s++; return s / a.length; }
+
 // Rebuild a vehicles list from a harvested arrangement (anchors) + the seed's
 // piece metadata (type/orient/len are constant across the component).
 function vehiclesFromState(seed, anchors) {
@@ -230,9 +247,9 @@ function vehiclesFromState(seed, anchors) {
 // ---------- generate pool ----------
 const MIN_MOVES = 6;
 const COMP_CAP = 160000;     // skip piece sets whose graph is larger than this
-const PER_COMPONENT = 30;    // varied puzzles harvested from each component
-const TARGET_POOL = 6000;
-const TIME_BUDGET_MS = 90000;
+const PER_COMPONENT = 12;    // varied puzzles harvested from each component
+const TARGET_POOL = 8000;
+const TIME_BUDGET_MS = 150000;
 
 const pool = [];
 const seen = new Set();
@@ -242,12 +259,13 @@ let lastLog = 0;
 
 while (pool.length < TARGET_POOL && (Date.now() - t0) < TIME_BUDGET_MS) {
   seeds++;
-  const fillers = 6 + rint(7); // 6..12 extra fillers (plus target + blockers)
+  const fillers = 7 + rint(7); // 7..13 extra fillers (plus target + blockers)
   const seed = randomBoard(fillers);
   const harvest = makeEngine(seed);
   const res = harvest(COMP_CAP);
   if (!res) continue;
   comps++;
+  const compPieces = pieceKey(seed);
 
   // gather solvable-and-non-trivial arrangements, sorted by difficulty
   const cand = [];
@@ -269,7 +287,7 @@ while (pool.length < TARGET_POOL && (Date.now() - t0) < TIME_BUDGET_MS) {
     const key = canon(vehicles);
     if (seen.has(key)) continue;
     seen.add(key);
-    pool.push({ vehicles, minMoves: res.dist[idx] });
+    pool.push({ vehicles, minMoves: res.dist[idx], pieces: compPieces, comp: comps });
   }
 
   if (Date.now() - lastLog >= 5000) {
@@ -288,41 +306,53 @@ console.error('range:', pool.length ? `${pool[0].minMoves}..${pool[pool.length -
 
 if (pool.length < 100) { console.error('ERROR: pool too small'); process.exit(1); }
 
-// ---------- select 100 following a smooth difficulty curve ----------
-// Group the pool by exact minMoves, then for each of 100 target difficulties
-// (interpolated from the easiest to the hardest available) pull the nearest
-// still-unused puzzle. This yields a smooth, monotonic gradient that uses the
-// whole range the pool offers, with the rarest hard puzzles reserved for the
-// top levels.
+// ---------- select 100: diverse piece-sets along a difficulty curve ----------
+// The old selection pulled many arrangements of the SAME piece set, so whole
+// blocks of levels felt identical. Now we CAP how many levels may share a piece
+// set, strongly prefer sets used least so far, and reject near-duplicate
+// layouts — while still following an easy->hard ramp.
 const WANT = 100;
-const buckets = new Map(); // minMoves -> [puzzles]
-for (const p of pool) {
-  if (!buckets.has(p.minMoves)) buckets.set(p.minMoves, []);
-  buckets.get(p.minMoves).push(p);
-}
 const lo = pool[0].minMoves;
 const hi = pool[pool.length - 1].minMoves;
+const distinctSets = new Set(pool.map((p) => p.pieces)).size;
+const CAP = Math.max(2, Math.ceil(WANT / distinctSets)); // as diverse as the pool allows
+console.error(`distinct piece-sets in pool: ${distinctSets} -> cap ${CAP} level(s) per set`);
 
-function takeNearest(target) {
-  for (let d = 0; d <= hi - lo; d++) {
-    for (const t of [target - d, target + d]) {
-      const arr = buckets.get(t);
-      if (arr && arr.length) return arr.pop();
-    }
-  }
-  return null;
-}
+for (const p of pool) p._grid = occGrid(p.vehicles);
 
 const chosen = [];
+const taken = new Uint8Array(pool.length);
+const usedSet = new Map();      // pieces -> count chosen
+const gridsBySet = new Map();   // pieces -> [chosen grids]
+
 for (let i = 0; i < WANT; i++) {
-  // ease-in curve: gentle ramp early, steeper toward the hardest levels
-  const f = Math.pow(i / (WANT - 1), 1.35);
-  const target = Math.round(lo + f * (hi - lo));
-  const pick = takeNearest(target);
-  if (pick) chosen.push(pick);
+  const f = Math.pow(i / (WANT - 1), 1.3);
+  const target = lo + f * (hi - lo);
+  let best = -1, bestScore = Infinity;
+  for (let k = 0; k < pool.length; k++) {
+    if (taken[k]) continue;
+    const e = pool[k];
+    const uc = usedSet.get(e.pieces) || 0;
+    if (uc >= CAP) continue;
+    const score = Math.abs(e.minMoves - target) + uc * 3; // prefer unused sets
+    if (score >= bestScore) continue;
+    const prev = gridsBySet.get(e.pieces);
+    if (prev && prev.some((g) => gridSim(g, e._grid) >= 0.9)) continue; // no near-dupes
+    bestScore = score; best = k;
+  }
+  if (best < 0) { // relax to fill if the diversity constraints leave a gap
+    let bd = Infinity;
+    for (let k = 0; k < pool.length; k++) { if (taken[k]) continue; const d = Math.abs(pool[k].minMoves - target); if (d < bd) { bd = d; best = k; } }
+  }
+  if (best < 0) break;
+  const e = pool[best];
+  taken[best] = 1;
+  usedSet.set(e.pieces, (usedSet.get(e.pieces) || 0) + 1);
+  if (!gridsBySet.has(e.pieces)) gridsBySet.set(e.pieces, []);
+  gridsBySet.get(e.pieces).push(e._grid);
+  chosen.push(e);
 }
 chosen.sort((a, b) => a.minMoves - b.minMoves);
-while (chosen.length < WANT && pool.length) chosen.push(pool[pool.length - 1]); // safety pad
 
 const tiers = ['leicht', 'mittel', 'schwer', 'sehr_schwer'];
 const puzzles = [];
@@ -338,11 +368,15 @@ for (let i = 0; i < WANT; i++) {
   puzzles.push({ id: i + 1, difficulty: tier, minMoves: src.minMoves, size: N, exitRow: EXIT_ROW, vehicles });
 }
 
+const allSets = new Set();
 for (let t = 0; t < 4; t++) {
   const slice = puzzles.slice(t * 25, t * 25 + 25);
   const mm = slice.map((p) => p.minMoves);
-  console.error(`${tiers[t]}: n=${slice.length} min=${Math.min(...mm)} max=${Math.max(...mm)} avg=${(mm.reduce((a, b) => a + b, 0) / mm.length).toFixed(1)}`);
+  const setsT = new Set(slice.map((p) => pieceKey(p.vehicles)));
+  slice.forEach((p) => allSets.add(pieceKey(p.vehicles)));
+  console.error(`${tiers[t]}: n=${slice.length} min=${Math.min(...mm)} max=${Math.max(...mm)} avg=${(mm.reduce((a, b) => a + b, 0) / mm.length).toFixed(1)} | distinct piece-sets: ${setsT.size}/25`);
 }
+console.error(`TOTAL distinct piece-sets across 100 levels: ${allSets.size} (was 17)`);
 
 const header = `/*
  * Parkplatz - puzzle data (auto-generated by tools/generate.js)

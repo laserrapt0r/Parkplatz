@@ -1,7 +1,7 @@
 /* Parkplatz - service worker for offline play (PWA).
    Cache-first for the app shell so the game works with no network. Bump
    CACHE_VERSION whenever assets change to roll the cache. */
-const CACHE_VERSION = 'parkplatz-v6';
+const CACHE_VERSION = 'parkplatz-v7';
 
 const ASSETS = [
   './',
