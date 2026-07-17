@@ -399,6 +399,14 @@ body.theme-neon {
 }
 body.theme-neon .brand-p { color: #2af0c8; }
 
+/* ---------------- right-to-left (Arabic) ---------------- */
+/* Most of the UI mirrors automatically via dir="rtl". Keep sliders and the
+   Latin brand word left-to-right so they stay intuitive. */
+html[dir="rtl"] input[type="range"] { direction: ltr; }
+html[dir="rtl"] #brand { direction: ltr; }
+html[dir="rtl"] .editor-status,
+html[dir="rtl"] .cr-min { direction: rtl; }
+
 /* ---------------- reduced motion ---------------- */
 body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after {
   animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important;

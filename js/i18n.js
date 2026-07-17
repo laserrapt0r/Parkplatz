@@ -301,10 +301,114 @@
       share: '分享', linkCopied: '链接已复制！', install: '安装应用',
       customBadge: '自定义', dailyBadge: '每日', randomBadge: '随机',
     },
+    'zh-Hant': {
+      tagline: '把紅色小車從塞車中解救出來。',
+      play: '開始遊戲', howto: '玩法說明', solvedLabel: '已解決', chooseLevel: '選擇關卡',
+      levelsShort: '關卡', levelWord: '關卡', movesWord: '步數', parWord: '最少',
+      undo: '復原', restart: '重來', hint: '提示', solved: '完成！', retry: '再玩一次', next: '下一關',
+      howtoTitle: '玩法說明',
+      howto1: '用滑鼠拖曳車輛——橫向或縱向。',
+      howto2: '車輛只能沿自身方向移動，且不能重疊。',
+      howto3: '清出通道，讓紅色小車開到出口。',
+      howto4: '步數越少，星星越多。達到最少步數即可獲得三顆星。',
+      gotit: '開始吧',
+      leicht: '簡單', mittel: '中等', schwer: '困難', sehr_schwer: '非常困難',
+      msg3: '完美！一步都不多。', msg2: '做得好——還能再短一點。', msg1: '解決了！試著用更少的步數。',
+      allDone: '所有關卡都通關了！太棒了！', hintNone: '暫無提示。', hintSolved: '就差一點——把它開出去！',
+      modeCampaign: '闖關模式', modeDaily: '每日謎題', modeRandom: '隨機謎題', editor: '關卡編輯器', settings: '設定', menu: '選單',
+      dailyTitle: '每日謎題', dailyToday: '今天', dailyDoneToday: '今天已解決',
+      randomTitle: '隨機謎題', randomPick: '選擇難度', generating: '正在產生謎題…', newRandom: '新謎題',
+      language: '語言', soundLabel: '音效', musicLabel: '背景音樂', sfxVolume: '音效音量', musicVolume: '音樂音量',
+      colorblindMode: '色盲模式', colorblindHint: '除顏色外增加圖案',
+      themeLabel: '主題', themeTag: '白天', themeNacht: '夜晚', themeNeon: '霓虹',
+      motionLabel: '動畫', motionAuto: '自動', motionReduced: '減弱', motionFull: '完整',
+      gatingLabel: '用星星解鎖關卡', resetProgress: '重設進度', resetConfirm: '確定要刪除所有進度嗎？',
+      on: '開', off: '關', locked: '已鎖定', needStars: '需要 {n} ⭐',
+      editorTitle: '關卡編輯器', toolTarget: '目標', toolMoto: '機車', toolCar: '轎車', toolBus: '公車', toolTruck: '卡車', toolErase: '刪除',
+      orientation: '方向', horizontal: '橫向', vertical: '縱向', clear: '清空', randomFill: '隨機', test: '測試', save: '儲存',
+      editorNoTarget: '把紅色目標車放到有出口的那一排。', editorUnsolvable: '無解——請調整佈局。',
+      editorSolvable: '{n} 步可解', editorTrivial: '太簡單了——加些障礙。', editorTooBig: '太複雜，無法檢測。',
+      myLevels: '我的關卡', noCustom: '還沒有儲存自訂關卡。', namePrompt: '為這個關卡命名：',
+      deleteWord: '刪除', deleteCustomConfirm: '刪除這個關卡嗎？', saved: '已儲存！',
+      keyboardHint: '鍵盤：Tab 選擇車輛，方向鍵移動。',
+      share: '分享', linkCopied: '連結已複製！', install: '安裝應用程式',
+      customBadge: '自訂', dailyBadge: '每日', randomBadge: '隨機',
+    },
+    ja: {
+      tagline: '赤い車を渋滞から助け出そう。',
+      play: 'スタート', howto: '遊び方', solvedLabel: 'クリア', chooseLevel: 'レベルを選ぶ',
+      levelsShort: 'レベル', levelWord: 'レベル', movesWord: '手数', parWord: '最少',
+      undo: '元に戻す', restart: 'やり直す', hint: 'ヒント', solved: 'クリア！', retry: 'もう一度', next: '次へ',
+      howtoTitle: '遊び方',
+      howto1: 'マウスで車をドラッグ――縦か横に動かします。',
+      howto2: '車は自分の向きにしか動かせず、重なることはできません。',
+      howto3: '道を空けて、赤い車を出口まで導きましょう。',
+      howto4: '手数が少ないほど星が多くなります。最少手数でクリアすると星3つ。',
+      gotit: 'はじめる',
+      leicht: 'かんたん', mittel: 'ふつう', schwer: 'むずかしい', sehr_schwer: 'とても難しい',
+      msg3: '完璧！一手も無駄がありません。', msg2: 'お見事――もう少し短くできます。', msg1: 'クリア！もっと少ない手数で挑戦してみましょう。',
+      allDone: '全レベルクリア！お見事！', hintNone: 'ヒントはありません。', hintSolved: 'あと少し――外に出しましょう！',
+      modeCampaign: 'キャンペーン', modeDaily: '今日のパズル', modeRandom: 'ランダムパズル', editor: 'レベルエディター', settings: '設定', menu: 'メニュー',
+      dailyTitle: '今日のパズル', dailyToday: '今日', dailyDoneToday: '今日はクリア済み',
+      randomTitle: 'ランダムパズル', randomPick: '難易度を選ぶ', generating: 'パズルを生成中…', newRandom: '新しいパズル',
+      language: '言語', soundLabel: '効果音', musicLabel: 'BGM', sfxVolume: '効果音の音量', musicVolume: '音楽の音量',
+      colorblindMode: '色覚サポート', colorblindHint: '色に加えて模様で区別',
+      themeLabel: 'テーマ', themeTag: '昼', themeNacht: '夜', themeNeon: 'ネオン',
+      motionLabel: 'アニメーション', motionAuto: '自動', motionReduced: '控えめ', motionFull: 'フル',
+      gatingLabel: '星でレベルを解放', resetProgress: '進行状況をリセット', resetConfirm: 'すべての進行状況を本当に削除しますか？',
+      on: 'オン', off: 'オフ', locked: 'ロック中', needStars: '星 {n} 個必要',
+      editorTitle: 'レベルエディター', toolTarget: 'ターゲット', toolMoto: 'バイク', toolCar: '車', toolBus: 'バス', toolTruck: 'トラック', toolErase: '消す',
+      orientation: '向き', horizontal: '横', vertical: '縦', clear: '空にする', randomFill: 'ランダム', test: 'テスト', save: '保存',
+      editorNoTarget: '赤いターゲット車を出口のある行に置いてください。', editorUnsolvable: '解けません――配置を変えてください。',
+      editorSolvable: '{n} 手で解けます', editorTrivial: '簡単すぎます――障害物を追加してください。', editorTooBig: '複雑すぎて確認できません。',
+      myLevels: 'マイレベル', noCustom: '保存された自作レベルはまだありません。', namePrompt: 'このレベルの名前：',
+      deleteWord: '削除', deleteCustomConfirm: 'このレベルを削除しますか？', saved: '保存しました！',
+      keyboardHint: 'キーボード：Tabで車を選び、矢印キーで動かします。',
+      share: '共有', linkCopied: 'リンクをコピーしました！', install: 'アプリをインストール',
+      customBadge: '自作', dailyBadge: 'デイリー', randomBadge: 'ランダム',
+    },
+    ar: {
+      tagline: 'حرّر السيارة الحمراء من الزحام.',
+      play: 'العب', howto: 'كيفية اللعب', solvedLabel: 'تم الحل', chooseLevel: 'اختر مستوى',
+      levelsShort: 'المستويات', levelWord: 'المستوى', movesWord: 'الحركات', parWord: 'الأدنى',
+      undo: 'تراجع', restart: 'إعادة', hint: 'تلميح', solved: 'تم الحل!', retry: 'مرة أخرى', next: 'التالي',
+      howtoTitle: 'كيفية اللعب',
+      howto1: 'اسحب المركبات بالفأرة – أفقيًا أو رأسيًا.',
+      howto2: 'تتحرك المركبات على محورها فقط ولا يمكن أن تتداخل.',
+      howto3: 'أفسح الطريق لتصل السيارة الحمراء إلى المخرج.',
+      howto4: 'حركات أقل = نجوم أكثر. حقّق الحد الأدنى للحصول على ثلاث نجوم.',
+      gotit: 'هيا بنا',
+      leicht: 'سهل', mittel: 'متوسط', schwer: 'صعب', sehr_schwer: 'صعب جدًا',
+      msg3: 'ممتاز! ولا حركة زائدة.', msg2: 'أحسنت – يمكن اختصارها قليلًا.', msg1: 'تم الحل! جرّب بعدد حركات أقل.',
+      allDone: 'اجتزت كل المستويات! برافو!', hintNone: 'لا يوجد تلميح.', hintSolved: 'اقتربت – أخرجها!',
+      modeCampaign: 'الحملة', modeDaily: 'أحجية اليوم', modeRandom: 'أحجية عشوائية', editor: 'محرر المستويات', settings: 'الإعدادات', menu: 'القائمة',
+      dailyTitle: 'أحجية اليوم', dailyToday: 'اليوم', dailyDoneToday: 'تم حلها اليوم',
+      randomTitle: 'أحجية عشوائية', randomPick: 'اختر مستوى الصعوبة', generating: 'جارٍ إنشاء الأحجية…', newRandom: 'أحجية جديدة',
+      language: 'اللغة', soundLabel: 'المؤثرات الصوتية', musicLabel: 'موسيقى الخلفية', sfxVolume: 'مستوى المؤثرات', musicVolume: 'مستوى الموسيقى',
+      colorblindMode: 'وضع عمى الألوان', colorblindHint: 'أنماط بالإضافة إلى اللون',
+      themeLabel: 'المظهر', themeTag: 'نهار', themeNacht: 'ليل', themeNeon: 'نيون',
+      motionLabel: 'الحركات', motionAuto: 'تلقائي', motionReduced: 'مخفّضة', motionFull: 'كاملة',
+      gatingLabel: 'افتح المستويات بالنجوم', resetProgress: 'إعادة ضبط التقدم', resetConfirm: 'هل تريد حقًا حذف كل التقدم؟',
+      on: 'تشغيل', off: 'إيقاف', locked: 'مقفل', needStars: 'يتطلب {n} ⭐',
+      editorTitle: 'محرر المستويات', toolTarget: 'الهدف', toolMoto: 'دراجة نارية', toolCar: 'سيارة', toolBus: 'حافلة', toolTruck: 'شاحنة', toolErase: 'مسح',
+      orientation: 'الاتجاه', horizontal: 'أفقي', vertical: 'رأسي', clear: 'إفراغ', randomFill: 'عشوائي', test: 'اختبار', save: 'حفظ',
+      editorNoTarget: 'ضع السيارة الحمراء في صف المخرج.', editorUnsolvable: 'غير قابلة للحل – غيّر الترتيب.',
+      editorSolvable: 'قابلة للحل في {n} حركة', editorTrivial: 'سهلة جدًا – أضف بعض العوائق.', editorTooBig: 'معقدة جدًا للتحقق.',
+      myLevels: 'مستوياتي', noCustom: 'لا توجد مستويات مخصّصة محفوظة بعد.', namePrompt: 'اسم هذا المستوى:',
+      deleteWord: 'حذف', deleteCustomConfirm: 'حذف هذا المستوى؟', saved: 'تم الحفظ!',
+      keyboardHint: 'لوحة المفاتيح: Tab لاختيار مركبة، الأسهم لتحريكها.',
+      share: 'مشاركة', linkCopied: 'تم نسخ الرابط!', install: 'تثبيت التطبيق',
+      customBadge: 'مخصّص', dailyBadge: 'يومي', randomBadge: 'عشوائي',
+    },
   };
 
   // Native language names for the language picker.
-  const NAMES = { de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano', pt: 'Português', nl: 'Nederlands', pl: 'Polski', zh: '中文' };
+  const NAMES = {
+    de: 'Deutsch', en: 'English', es: 'Español', fr: 'Français', it: 'Italiano',
+    pt: 'Português', nl: 'Nederlands', pl: 'Polski', zh: '简体中文', 'zh-Hant': '繁體中文',
+    ja: '日本語', ar: 'العربية',
+  };
+  const RTL = { ar: true };
 
   let lang = 'de';
 
@@ -312,14 +416,18 @@
     get lang() { return lang; },
     get available() { return Object.keys(STRINGS); },
     name(code) { return NAMES[code] || code; },
+    get rtl() { return !!RTL[lang]; },
     set(l) {
       lang = STRINGS[l] ? l : 'en';
       document.documentElement.lang = lang;
+      document.documentElement.dir = RTL[lang] ? 'rtl' : 'ltr';
       this.apply();
     },
-    // pick the best supported language for a BCP-47 tag like "es-ES"
+    // pick the best supported language for a BCP-47 tag like "es-ES" or "zh-TW"
     detect(pref) {
-      const base = (pref || 'en').toLowerCase().slice(0, 2);
+      const p = (pref || 'en').toLowerCase();
+      if (p.indexOf('zh') === 0) return /hant|tw|hk|mo/.test(p) ? 'zh-Hant' : 'zh';
+      const base = p.slice(0, 2);
       return STRINGS[base] ? base : 'en';
     },
     t(key) {
