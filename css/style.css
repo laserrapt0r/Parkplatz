@@ -125,6 +125,9 @@ html, body {
 }
 .btn-primary:hover { background: linear-gradient(180deg, #ff7d82, #f2565c); }
 .btn-ghost { background: rgba(255, 255, 255, 0.04); }
+.btn:disabled, .btn.is-off { opacity: .4; pointer-events: none; }
+.settings-head { display: flex; align-items: center; gap: 12px; }
+.settings-head h2 { margin: 0; }
 
 /* ---------------- menu ---------------- */
 #screen-menu { align-items: center; justify-content: center; }
