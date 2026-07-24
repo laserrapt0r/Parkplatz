@@ -22,7 +22,7 @@ RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
     mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
     rm /tmp/cmdline.zip && \
     yes | sdkmanager --licenses > /dev/null && \
-    sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null && \
+    sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "platforms;android-35" "build-tools;35.0.0" > /dev/null && \
     chmod -R a+rwX ${ANDROID_SDK_ROOT}
 
 # Make the SDK writable so a non-root caller (docker run -u $(id -u)) can let

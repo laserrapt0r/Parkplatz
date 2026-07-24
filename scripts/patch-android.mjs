@@ -18,3 +18,28 @@ s = s.replace(/versionCode\s+\d+/, `versionCode ${code}`);
 s = s.replace(/versionName\s+"[^"]*"/, `versionName "${name}"`);
 writeFileSync(gradle, s);
 console.log(`patched android version -> name=${name} code=${code}`);
+
+// ---- target/compile SDK -------------------------------------------------
+// Google Play requires the target API to be within one year of the latest
+// Android release. Raising targetSdk does NOT drop support for older devices
+// (that is minSdk) — it only opts into the newer platform behaviour.
+const TARGET_SDK = process.env.TARGET_SDK || '36';
+const varsPath = resolve(root, 'android/variables.gradle');
+if (existsSync(varsPath)) {
+  let v = readFileSync(varsPath, 'utf8');
+  v = v.replace(/compileSdkVersion\s*=\s*\d+/, `compileSdkVersion = ${TARGET_SDK}`);
+  v = v.replace(/targetSdkVersion\s*=\s*\d+/, `targetSdkVersion = ${TARGET_SDK}`);
+  writeFileSync(varsPath, v);
+  console.log(`patched compileSdk/targetSdk -> ${TARGET_SDK}`);
+}
+// AGP warns/errors when compiling against an SDK newer than it was tested with;
+// this acknowledges it explicitly.
+const propsPath = resolve(root, 'android/gradle.properties');
+if (existsSync(propsPath)) {
+  let p = readFileSync(propsPath, 'utf8');
+  if (!/suppressUnsupportedCompileSdk/.test(p)) {
+    p += `\nandroid.suppressUnsupportedCompileSdk=${TARGET_SDK}\n`;
+    writeFileSync(propsPath, p);
+    console.log('added android.suppressUnsupportedCompileSdk');
+  }
+}
