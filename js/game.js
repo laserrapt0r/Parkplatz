@@ -394,9 +394,11 @@
 
   function drawVehicleLocal(lenPx, widPx, v) {
     const c = ctx, hl = lenPx / 2, hw = widPx / 2, base = v.color;
+    // A motorcycle is much smaller than its cell, so the car-sized offset
+    // shadow made it look off-centre — it draws its own slim shadow instead.
+    if (v.type === 'moto') { drawMoto(lenPx, widPx, v); return; }
     c.save(); c.globalAlpha = 0.28; c.fillStyle = '#000';
     roundRect(c, -hl + cs * 0.05, -hw + cs * 0.11, lenPx, widPx, widPx * 0.3); c.fill(); c.restore();
-    if (v.type === 'moto') { drawMoto(lenPx, widPx, v); return; }
     const grad = c.createLinearGradient(0, -hw, 0, hw);
     grad.addColorStop(0, shade(base, 0.28)); grad.addColorStop(0.5, base); grad.addColorStop(1, shade(base, -0.22));
     c.fillStyle = grad;
@@ -452,18 +454,40 @@
     c.fillStyle = 'rgba(255,255,255,0.08)';
     roundRect(c, -hl + lenPx * 0.06, -widPx * 0.06, lenPx * 0.88, widPx * 0.12, widPx * 0.06); c.fill();
   }
+  // Top-down motorcycle: two in-line wheels, tank + seat, and a wide handlebar
+  // with mirrors (the silhouette that actually reads as "motorcycle" at this
+  // size). Everything is mirror-symmetric about the driving axis.
   function drawMoto(lenPx, widPx, v) {
-    const c = ctx, bodyLen = lenPx * 0.78, bodyWid = widPx * 0.42;
-    const grad = c.createLinearGradient(0, -bodyWid, 0, bodyWid);
-    grad.addColorStop(0, shade(v.color, 0.3)); grad.addColorStop(1, shade(v.color, -0.25));
-    c.fillStyle = 'rgba(18,20,26,0.9)';
-    roundRect(c, -bodyLen / 2 - lenPx * 0.02, -bodyWid * 0.5, lenPx * 0.16, bodyWid, bodyWid * 0.4); c.fill();
-    roundRect(c, bodyLen / 2 - lenPx * 0.14, -bodyWid * 0.5, lenPx * 0.16, bodyWid, bodyWid * 0.4); c.fill();
-    c.fillStyle = grad; roundRect(c, -bodyLen / 2, -bodyWid / 2, bodyLen, bodyWid, bodyWid * 0.5); c.fill();
-    c.fillStyle = shade(v.color, -0.4); roundRect(c, -bodyLen * 0.3, -bodyWid * 0.42, bodyLen * 0.34, bodyWid * 0.84, bodyWid * 0.3); c.fill();
-    c.strokeStyle = 'rgba(20,22,28,0.8)'; c.lineWidth = Math.max(1.5, cs * 0.04); c.lineCap = 'round';
-    c.beginPath(); c.moveTo(bodyLen * 0.24, -bodyWid * 0.7); c.lineTo(bodyLen * 0.24, bodyWid * 0.7); c.stroke();
-    c.fillStyle = 'rgba(255,244,200,0.95)'; c.beginPath(); c.arc(bodyLen * 0.42, 0, bodyWid * 0.22, 0, Math.PI * 2); c.fill();
+    const c = ctx, L = lenPx, W = widPx;
+    const dark = 'rgba(20,23,30,0.95)';
+    const bx = -L * 0.34, bLen = L * 0.64, bWid = W * 0.38;
+
+    // drop shadow with exactly the body's footprint, like the cars have
+    c.save();
+    c.globalAlpha = 0.26; c.fillStyle = '#000';
+    roundRect(c, bx + cs * 0.03, -bWid / 2 + cs * 0.06, bLen, bWid, bWid * 0.45);
+    c.fill(); c.restore();
+
+    // wheels and handlebar go underneath, so only their tips peek out
+    c.fillStyle = dark;
+    roundRect(c, -L * 0.45, -W * 0.10, L * 0.22, W * 0.20, W * 0.09); c.fill();
+    roundRect(c, L * 0.23, -W * 0.10, L * 0.22, W * 0.20, W * 0.09); c.fill();
+    roundRect(c, L * 0.145, -W * 0.33, L * 0.055, W * 0.66, W * 0.028); c.fill();
+
+    // body: tank + seat
+    const grad = c.createLinearGradient(0, -bWid / 2, 0, bWid / 2);
+    grad.addColorStop(0, shade(v.color, 0.34));
+    grad.addColorStop(1, shade(v.color, -0.26));
+    c.fillStyle = grad;
+    roundRect(c, bx, -bWid / 2, bLen, bWid, bWid * 0.45); c.fill();
+
+    // seat (rear part, darker)
+    c.fillStyle = shade(v.color, -0.42);
+    roundRect(c, bx + L * 0.015, -bWid * 0.37, L * 0.23, bWid * 0.74, bWid * 0.3); c.fill();
+
+    // headlight in the nose
+    c.fillStyle = 'rgba(255,244,200,0.95)';
+    c.beginPath(); c.ellipse(bx + bLen - L * 0.05, 0, L * 0.042, W * 0.095, 0, 0, Math.PI * 2); c.fill();
   }
   function drawPattern(lenPx, widPx, v) {
     const c = ctx, hl = lenPx / 2, hw = widPx / 2;
