@@ -154,7 +154,7 @@
             for (let r = r0 + len[i]; r < N; r++) { if (grid[r * N + c0] !== -1) break; const nr = r - len[i] + 1; const ns = st.slice(); ns[i] = nr * N + c0; const k = key(ns); if (!visited.has(k)) { visited.add(k); next.push(ns); } }
           }
         }
-        if (visited.size > cap) return -1;
+        if (visited.size > cap) return -2; // too complex to verify (distinct from unsolvable)
       }
       frontier = next;
     }

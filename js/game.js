@@ -126,7 +126,7 @@
     level = puzzle;
     ctxSource = context || { source: 'campaign' };
     moves = 0; history = []; hint = null; phase = 'idle'; drag = null;
-    selIndex = null; slideCtx = null; particles = [];
+    selIndex = null; slideCtx = null; particles = []; shakeVeh = null;
     vehicles = makeVehicles(puzzle.vehicles);
     targetVeh = vehicles.find((v) => v.target);
     mode = 'play'; canvas = boardCanvas; ctx = boardCtx;
@@ -168,7 +168,9 @@
   function relayout() {
     const wrap = canvas.parentElement;
     const availW = wrap.clientWidth, availH = wrap.clientHeight;
-    cs = Math.max(30, Math.floor(Math.min(availW / W_CELLS, availH / H_CELLS)));
+    // low floor: with 30px minimum a landscape phone clipped rows 0 and 5 of
+    // the board — a small but complete board beats a cropped one
+    cs = Math.max(16, Math.floor(Math.min(availW / W_CELLS, availH / H_CELLS)));
     const cssW = Math.round(W_CELLS * cs), cssH = Math.round(H_CELLS * cs);
     dpr = window.devicePixelRatio || 1;
     canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
@@ -231,6 +233,7 @@
   function onDown(e) {
     Sfx.unlock(); tryStartMusic();
     if (mode !== 'play' || phase !== 'idle') return;
+    if (drag) return; // second finger during a drag would corrupt the offset
     const p = pointerPos(e);
     const idx = vehicleAt(p.x, p.y);
     if (idx < 0) return;
@@ -276,6 +279,7 @@
     const v = vehicles[idx];
     if (!merge) { history.push(vehicles.map((k) => ({ row: k.row, col: k.col }))); moves++; }
     v.row = newRow; v.col = newCol;
+    hint = null; // any move invalidates a shown hint (keyboard path had none)
     $('hud-moves').textContent = moves;
     updateHudStars();
     Sfx.move(); setTimeout(() => Sfx.snap(), 55);
@@ -325,9 +329,12 @@
     const stars = computeStars(moves);
     recordResult(stars, moves);
     if (ctxSource.source === 'campaign' && !Storage.tipShown && Storage.totals().solved >= TIP_AFTER_LEVELS) pendingTip = true;
+    refreshMenuProgress();
+    // If the player navigated away during the drive-out animation, keep the
+    // recorded result but don't paint confetti + win overlay over that screen.
+    if (mode !== 'play' || !screens.game.classList.contains('active')) return;
     if (!reduceMotion) spawnConfetti();
     showWin(stars);
-    refreshMenuProgress();
   }
   function recordResult(stars, m) {
     const s = ctxSource.source;
@@ -581,7 +588,8 @@
     for (let i = 0; i < vehicles.length; i++) {
       const v = vehicles[i];
       if (drag && drag.idx === i) continue;
-      if (phase === 'winning' && v.target) continue;
+      // 'won' included: otherwise the car eases back into the lot behind the overlay
+      if ((phase === 'winning' || phase === 'won') && v.target) continue;
       const p = pxFor(v.row, v.col);
       v.animX += (p.x - v.animX) * ease; v.animY += (p.y - v.animY) * ease;
     }
@@ -607,12 +615,28 @@
     if (name === 'levels') buildLevelSelect();
     if (name === 'menu') refreshMenuProgress();
     if (name === 'settings') syncSettingsUI();
-    if (name === 'editor') { mode = 'edit'; canvas = editCanvas; ctx = editCtx; renderCustomList(); setTimeout(() => { relayout(); }, 0); }
+    if (name === 'editor') {
+      mode = 'edit'; canvas = editCanvas; ctx = editCtx; renderCustomList();
+      // refresh status + orientation label: a language switch while the editor
+      // was inactive leaves both stale (data-i18n rewrote the orient button)
+      refreshEditor();
+      $('tool-orient').textContent = I18n.t(curOrient === 'H' ? 'horizontal' : 'vertical');
+      setTimeout(() => { relayout(); }, 0);
+    }
     if (name === 'game') { mode = 'play'; canvas = boardCanvas; ctx = boardCtx; setTimeout(relayout, 0); }
     if (name !== 'game' && name !== 'editor') mode = 'none';
+    // leaving the game invalidates the deep-link URL of the running level
+    if (name !== 'game' && location.search) { try { history_replace(location.pathname); } catch (e) { /* ignore */ } }
     sizeFx();
   }
   function activeScreen() { return Object.keys(screens).find((k) => screens[k].classList.contains('active')) || 'menu'; }
+  // Sequential unlock within a tier (same rule as buildLevelSelect).
+  function levelUnlocked(p) {
+    if (!Storage.gating) return true;
+    const tier = PUZZLES.filter((x) => x.difficulty === p.difficulty);
+    const idx = tier.findIndex((x) => x.id === p.id);
+    return idx <= 0 || !!Storage.getLevel(tier[idx - 1].id);
+  }
   function refreshMenuProgress() { const t = Storage.totals(); $('menu-solved').textContent = t.solved; $('menu-stars').textContent = t.stars; }
 
   // ---------------------------------------------------------------- level select (with gating)
@@ -671,20 +695,28 @@
     moves = Math.max(0, moves - 1); $('hud-moves').textContent = moves; updateHudStars();
     hint = null; slideCtx = null; Sfx.click();
   }
-  function doRestart() { if (level) { loadPuzzle(level, ctxSource); Sfx.click(); } }
+  // Same phase guard as undo/hint: restarting during the win animation would
+  // silently throw the earned result away.
+  function doRestart() { if (mode !== 'play' || phase !== 'idle' || !level) return; loadPuzzle(level, ctxSource); Sfx.click(); }
   function doHint() {
     if (mode !== 'play' || phase !== 'idle' || !level) return;
     if (NO_HINT[level.difficulty]) return; // no hints on the hardest tiers
     Sfx.click();
     let res = null; try { res = Solver.solveNext(N, vehicles); } catch (e) { res = null; }
-    if (!res) { if (targetVeh && freeRange(vehicles.indexOf(targetVeh)).max >= goalCol) hint = { index: vehicles.indexOf(targetVeh), axis: 'H', delta: 1 }; return; }
+    if (!res) {
+      if (targetVeh && freeRange(vehicles.indexOf(targetVeh)).max >= goalCol) hint = { index: vehicles.indexOf(targetVeh), axis: 'H', delta: 1 };
+      else toast(I18n.t('hintNone')); // solver gave up (state cap) — say so instead of a dead click
+      return;
+    }
     hint = res;
   }
 
   // ---------------------------------------------------------------- share
   function shareLink() {
     const s = ctxSource.source;
-    let url = location.origin + location.pathname.replace(/index\.html$/, '');
+    // APP_URL, not location: inside the Android app the origin is
+    // https://localhost — useless to whoever receives the link
+    let url = APP_URL;
     if (s === 'campaign') url += '?level=' + level.id;
     else if (s === 'daily') url += '?daily';
     else return;
@@ -717,30 +749,50 @@
   function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function startDaily() {
     const date = todayStr();
+    if (Storage.getDaily && Storage.getDaily(date)) toast(I18n.t('dailyDoneToday'));
     let puzzle = Storage.getDailyPuzzle(date);
     if (puzzle) { loadPuzzle(puzzle, { source: 'daily', date }); return; }
     showSpinner(true);
-    setTimeout(() => {
-      puzzle = (window.PuzzleGen && PuzzleGen.dailyPuzzle(date)) || pickCampaignByHash(date);
-      Storage.setDailyPuzzle(date, puzzle);
+    const PG = window.PuzzleGen || null;
+    const finish = (p) => {
+      // If generation missed the weekday's difficulty band (it is iteration-
+      // bounded, so that happens), take a campaign level of the right tier —
+      // deterministically by date, so every device still gets the same daily.
+      const want = PG ? PG.dailyDifficulty(date) : null;
+      if (!p || (want && PG.RANGE[want] && p.minMoves < PG.RANGE[want][0])) {
+        p = pickCampaignOfTierByHash(date, want) || pickCampaignByHash(date);
+      }
+      Storage.setDailyPuzzle(date, p);
       showSpinner(false);
-      loadPuzzle(puzzle, { source: 'daily', date });
-    }, 30);
+      loadPuzzle(p, { source: 'daily', date });
+    };
+    // chunked generation: yields to the event loop between attempts so a slow
+    // device never sits in a frozen frame ("app not responding")
+    if (PG && PG.dailyPuzzleAsync) PG.dailyPuzzleAsync(date, finish);
+    else finish(null);
   }
   function pickCampaignByHash(str) { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0; return PUZZLES[Math.abs(h) % PUZZLES.length]; }
+  function pickCampaignOfTierByHash(str, diff) {
+    const pool = PUZZLES.filter((x) => x.difficulty === diff);
+    if (!pool.length) return null;
+    let h = 0; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return pool[Math.abs(h) % pool.length];
+  }
   function randomCampaignOfTier(diff) { const pool = PUZZLES.filter((p) => p.difficulty === diff); return pool[(Math.random() * pool.length) | 0]; }
   function startRandom(diff) {
     showSpinner(true);
-    setTimeout(() => {
-      let p = window.PuzzleGen ? PuzzleGen.randomPuzzle(diff) : null;
-      const R = PuzzleGen ? PuzzleGen.RANGE[diff] : null;
+    const PG = window.PuzzleGen || null; // bare identifier would throw if the script failed to load
+    const finish = (p) => {
+      const R = PG ? PG.RANGE[diff] : null;
       // Accept a fresh puzzle unless it's clearly too easy for the tier (harder
       // than the band is fine). Only then fall back to a campaign puzzle. This
       // keeps random puzzles fresh instead of repeating campaign levels.
       if (!p || (R && p.minMoves < R[0] - 3)) p = randomCampaignOfTier(diff);
       showSpinner(false);
       loadPuzzle(p, { source: 'random' });
-    }, 30);
+    };
+    if (PG && PG.randomPuzzleAsync) PG.randomPuzzleAsync(diff, finish);
+    else finish(null);
   }
   function showSpinner(on) { $('overlay-spinner').classList.toggle('show', !!on); }
 
@@ -800,11 +852,14 @@
   function refreshEditor() {
     const status = $('editor-status');
     const hasTarget = editVehicles.some((v) => v.target);
-    if (!hasTarget) { editorMin = -2; status.textContent = I18n.t('editorNoTarget'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = true; return; }
+    if (!hasTarget) { editorMin = -3; status.textContent = I18n.t('editorNoTarget'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = true; return; }
     let m = -1; try { m = Solver.solve(N, editorToPuzzle(), 200000); } catch (e) { m = -1; }
     editorMin = m;
-    if (m < 0) { status.textContent = I18n.t('editorUnsolvable'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = true; }
-    else if (m === 0) { status.textContent = I18n.t('editorTrivial'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = false; }
+    // -2 = state cap exceeded: solvability is unknown, not disproven — show
+    // "too complex" instead of wrongly claiming the board is unsolvable
+    if (m === -2) { status.textContent = I18n.t('editorTooBig'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = true; }
+    else if (m < 0) { status.textContent = I18n.t('editorUnsolvable'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = true; }
+    else if (m === 0) { status.textContent = I18n.t('editorTrivial'); status.className = 'editor-status warn'; $('btn-ed-save').disabled = true; $('btn-ed-test').disabled = true; }
     else { status.textContent = I18n.t('editorSolvable').replace('{n}', m); status.className = 'editor-status ok'; $('btn-ed-save').disabled = false; $('btn-ed-test').disabled = false; }
   }
   function renderEdit() {
@@ -827,7 +882,7 @@
       if (p) { editVehicles = p.vehicles.map((v) => ({ type: v.type, orient: v.orient, len: v.len, row: v.row, col: v.col, target: !!v.target })); refreshEditor(); }
     }, 30);
   }
-  function editorTest() { if (editorMin === 0 || editorMin > 0) { loadPuzzle({ difficulty: 'custom', minMoves: Math.max(editorMin, 1), size: N, exitRow: EXIT_ROW, vehicles: editorToPuzzle() }, { source: 'test' }); } }
+  function editorTest() { if (editorMin > 0) { loadPuzzle({ difficulty: 'custom', minMoves: editorMin, size: N, exitRow: EXIT_ROW, vehicles: editorToPuzzle() }, { source: 'test' }); } }
   function editorSave() {
     if (editorMin <= 0) return;
     const name = window.prompt(I18n.t('namePrompt'), '');
@@ -861,6 +916,9 @@
   }
   function applyAudioSettings() {
     Sfx.setEnabled(Storage.soundOn); Sfx.setSfxVol(Storage.sfxVol); Sfx.setMusicVol(Storage.musicVol);
+    // also sync the music state — a settings reset turns musicOn off while
+    // the loop keeps playing otherwise
+    if (Sfx.musicEnabled !== !!Storage.musicOn) Sfx.setMusicEnabled(!!Storage.musicOn);
     updateSoundBtn();
   }
   function tryStartMusic() { if (Storage.musicOn) Sfx.setMusicEnabled(true); }
@@ -1011,13 +1069,18 @@
     boardCanvas.addEventListener('touchstart', onDown, { passive: false });
     window.addEventListener('touchmove', onMove, { passive: false });
     window.addEventListener('touchend', onUp);
+    // system gestures (notification shade, back swipe, incoming call) end the
+    // touch with touchcancel — without this the drag sticks to the vehicle
+    window.addEventListener('touchcancel', () => { if (drag) { drag = null; slideCtx = null; } });
     window.addEventListener('keydown', onKey);
 
     window.addEventListener('resize', () => { if (mode !== 'none') relayout(); else sizeFx(); });
     document.addEventListener('langchange', () => {
       if (screens.levels.classList.contains('active')) buildLevelSelect();
       if (screens.editor.classList.contains('active')) { renderCustomList(); refreshEditor(); $('tool-orient').textContent = I18n.t(curOrient === 'H' ? 'horizontal' : 'vertical'); }
-      if (mode === 'play' && level) updateHudMode();
+      // language is only switchable from settings, where mode is 'none' — the
+      // HUD of the still-loaded level must be refreshed regardless
+      if (level) updateHudMode();
     });
 
     // PWA install prompt
@@ -1028,7 +1091,7 @@
     const carTool = document.querySelector('#editor-tools .tool[data-tool="car"]'); if (carTool) carTool.classList.add('active');
     $('tool-orient').textContent = I18n.t('horizontal');
 
-    if (!PUZZLES.length) { document.querySelector('.menu-sub').textContent = 'Fehler: Rätseldaten nicht geladen.'; }
+    if (!PUZZLES.length) { const ms = document.querySelector('.menu-sub'); ms.removeAttribute('data-i18n'); ms.textContent = 'Fehler: Rätseldaten nicht geladen. / Error: puzzle data missing.'; }
 
     // deep links
     handleDeepLink();
@@ -1052,7 +1115,16 @@
   function handleDeepLink() {
     try {
       const params = new URLSearchParams(location.search);
-      if (params.has('level')) { const id = parseInt(params.get('level'), 10); if (byId[id]) { loadPuzzle(byId[id], { source: 'campaign' }); return; } }
+      if (params.has('level')) {
+        const id = parseInt(params.get('level'), 10);
+        const p = byId[id];
+        if (p) {
+          // deep links must respect the same gating as the level select
+          if (levelUnlocked(p)) loadPuzzle(p, { source: 'campaign' });
+          else { setScreen('levels'); toast(I18n.t('needPrev')); }
+          return;
+        }
+      }
       if (params.has('daily')) { startDaily(); return; }
       if (params.has('random')) { const d = params.get('random'); if (PuzzleGen.RANGE[d]) { startRandom(d); return; } }
     } catch (e) { /* ignore */ }

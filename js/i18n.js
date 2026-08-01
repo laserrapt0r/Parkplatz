@@ -583,11 +583,25 @@
       this.apply();
     },
     // pick the best supported language for a BCP-47 tag like "es-ES" or "zh-TW"
+    matchTag(pref) {
+      const p = (pref || '').toLowerCase();
+      if (!p) return null;
+      if (p.indexOf('zh') === 0) {
+        // script subtag wins over region: zh-Hans-MO is Simplified
+        if (/(^|-)hans(-|$)/.test(p)) return 'zh';
+        return /(^|-)hant(-|$)|(^|-)(tw|hk|mo)(-|$)/.test(p) ? 'zh-Hant' : 'zh';
+      }
+      const base = p.split('-')[0]; // full primary subtag, not slice(0,2): "por" must not become "po"
+      const map = { deu: 'de', ger: 'de', eng: 'en', spa: 'es', fra: 'fr', fre: 'fr', ita: 'it', por: 'pt', nld: 'nl', dut: 'nl', pol: 'pl', jpn: 'ja', ara: 'ar', kor: 'ko', rus: 'ru', tur: 'tr', zho: 'zh' };
+      const code = map[base] || base;
+      return STRINGS[code] ? code : null;
+    },
+    // walk the full preference list — the second-choice language beats
+    // falling back to English
     detect(pref) {
-      const p = (pref || 'en').toLowerCase();
-      if (p.indexOf('zh') === 0) return /hant|tw|hk|mo/.test(p) ? 'zh-Hant' : 'zh';
-      const base = p.slice(0, 2);
-      return STRINGS[base] ? base : 'en';
+      const list = (navigator.languages && navigator.languages.length) ? navigator.languages : [pref];
+      for (const tag of list) { const hit = this.matchTag(tag); if (hit) return hit; }
+      return this.matchTag(pref) || 'en';
     },
     t(key) {
       return (STRINGS[lang] && STRINGS[lang][key]) || STRINGS.en[key] || STRINGS.de[key] || key;
@@ -595,6 +609,11 @@
     apply() {
       document.querySelectorAll('[data-i18n]').forEach((el) => {
         el.textContent = this.t(el.getAttribute('data-i18n'));
+      });
+      // icon-only buttons: translate their tooltip + screen-reader label too
+      document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+        const s = this.t(el.getAttribute('data-i18n-title'));
+        el.setAttribute('title', s); el.setAttribute('aria-label', s);
       });
       document.dispatchEvent(new CustomEvent('langchange'));
     },

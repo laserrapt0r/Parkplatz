@@ -34,11 +34,16 @@
     s.daily = data.daily || {};
     s.dailyPuzzles = data.dailyPuzzles || {};
     s.custom = data.custom || [];
+    // saves from before customSeq existed: continue after the highest id,
+    // otherwise a new level reuses id 1 and delete/record hit both entries
+    if (!(typeof s.customSeq === 'number' && s.customSeq > 0) || s.custom.some((c) => c.id >= s.customSeq)) {
+      s.customSeq = s.custom.reduce((m, c) => Math.max(m, (c && c.id) || 0), 0) + 1;
+    }
     return s;
   }
 
   let state = load();
-  function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* quota */ } }
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { try { console.warn('Parkplatz: Speichern fehlgeschlagen (Quota?)', e); } catch (e2) { /* noop */ } } }
 
   const Storage = {
     // ---- generic settings ----
@@ -69,7 +74,7 @@
       const prev = state.progress[id];
       state.progress[id] = {
         stars: Math.max(stars, prev ? prev.stars : 0),
-        bestMoves: prev ? Math.min(moves, prev.bestMoves) : moves,
+        bestMoves: (prev && prev.bestMoves != null) ? Math.min(moves, prev.bestMoves) : moves,
       };
       persist();
       return state.progress[id];
