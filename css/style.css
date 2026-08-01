@@ -41,6 +41,12 @@ html, body {
   background:
     radial-gradient(1200px 700px at 50% -10%, #263250 0%, transparent 60%),
     linear-gradient(180deg, var(--bg-1), var(--bg-0));
+  /* Keep our controls clear of notches, the status bar and Android's
+     gesture bar when the app is drawn edge-to-edge (viewport-fit=cover). */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
 }
 
 /* ---------------- top bar ---------------- */
