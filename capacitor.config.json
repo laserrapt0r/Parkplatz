@@ -4,6 +4,7 @@
   "webDir": "www",
   "backgroundColor": "#141a26",
   "android": {
-    "backgroundColor": "#141a26"
+    "backgroundColor": "#141a26",
+    "adjustMarginsForEdgeToEdge": "auto"
   }
 }

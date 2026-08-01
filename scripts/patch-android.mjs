@@ -43,3 +43,28 @@ if (existsSync(propsPath)) {
     console.log('added android.suppressUnsupportedCompileSdk');
   }
 }
+
+// ---- edge-to-edge system bars ------------------------------------------
+// Targeting SDK 35+ forces edge-to-edge drawing; Capacitor's
+// adjustMarginsForEdgeToEdge (capacitor.config.json) then insets the WebView,
+// and the exposed margins show the window background. Make that background
+// our app colour and keep the system-bar icons light, or a light-mode device
+// paints white bars with dark icons around the dark game.
+const stylesPath = resolve(root, 'android/app/src/main/res/values/styles.xml');
+if (existsSync(stylesPath)) {
+  let x = readFileSync(stylesPath, 'utf8');
+  if (!/windowLightStatusBar/.test(x)) {
+    const items = [
+      '        <item name="android:windowBackground">#ff141a26</item>',
+      '        <item name="android:windowLightStatusBar">false</item>',
+      '        <item name="android:windowLightNavigationBar">false</item>',
+    ].join('\n');
+    const before = x;
+    x = x.replace(
+      /(<style name="AppTheme"[^>]*>)/,
+      `$1\n${items}`
+    );
+    if (x === before) { console.error('WARNING: AppTheme not found in styles.xml — system bars not themed'); }
+    else { writeFileSync(stylesPath, x); console.log('patched styles.xml for edge-to-edge system bars'); }
+  }
+}
