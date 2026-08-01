@@ -7,15 +7,25 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const gradle = resolve(root, 'android/app/build.gradle');
-if (!existsSync(gradle)) { console.error('android/app/build.gradle not found — run `cap add android` first.'); process.exit(0); }
+// Hard failure: a missing gradle file means `cap add android` broke — exiting 0
+// here would let the build continue with template defaults (versionCode 1).
+if (!existsSync(gradle)) { console.error('android/app/build.gradle not found — run `cap add android` first.'); process.exit(1); }
 
 const pkg = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 const name = process.env.VERSION_NAME || pkg.version || '1.0.0';
 const code = process.env.VERSION_CODE || '1';
 
+// replace() is a silent no-op when the pattern is missing (e.g. a future
+// Capacitor template switches to `versionCode = 1` assignment syntax) —
+// verify every patch actually landed and fail the build otherwise.
+function mustReplace(src, re, replacement, what) {
+  if (!re.test(src)) { console.error(`FEHLER: Muster für ${what} nicht gefunden — Template geändert?`); process.exit(1); }
+  return src.replace(re, replacement);
+}
+
 let s = readFileSync(gradle, 'utf8');
-s = s.replace(/versionCode\s+\d+/, `versionCode ${code}`);
-s = s.replace(/versionName\s+"[^"]*"/, `versionName "${name}"`);
+s = mustReplace(s, /versionCode\s+\d+/, `versionCode ${code}`, 'versionCode');
+s = mustReplace(s, /versionName\s+"[^"]*"/, `versionName "${name}"`, 'versionName');
 writeFileSync(gradle, s);
 console.log(`patched android version -> name=${name} code=${code}`);
 
@@ -52,6 +62,18 @@ if (existsSync(propsPath)) {
 // paints white bars with dark icons around the dark game.
 // NB: the activity runs with AppTheme.NoActionBar, whose explicit parent
 // bypasses the base AppTheme — the items must go into that style.
+// The game is a portrait layout (manifest.webmanifest already declares it for
+// the PWA); lock the activity so landscape can't crop the board.
+const manifestPath = resolve(root, 'android/app/src/main/AndroidManifest.xml');
+if (existsSync(manifestPath)) {
+  let mx = readFileSync(manifestPath, 'utf8');
+  if (!/screenOrientation/.test(mx)) {
+    mx = mustReplace(mx, /<activity\b/, '<activity\n            android:screenOrientation="userPortrait"', 'activity orientation');
+    writeFileSync(manifestPath, mx);
+    console.log('locked activity to portrait');
+  }
+}
+
 const stylesPath = resolve(root, 'android/app/src/main/res/values/styles.xml');
 if (existsSync(stylesPath)) {
   let x = readFileSync(stylesPath, 'utf8');

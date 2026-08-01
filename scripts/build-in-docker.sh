@@ -20,7 +20,9 @@ if [ ! -d android ]; then npx --yes cap add android; fi
 npx cap sync android
 
 echo "== version =="
-node scripts/patch-android.mjs || true
+# VERSION_NAME/VERSION_CODE come through the environment (docker run -e ...);
+# no `|| true`: a failed patch must fail the build, not ship versionCode 1.
+node scripts/patch-android.mjs
 
 echo "== generate icons/splash (optional) =="
 if [ -f resources/icon.png ]; then
