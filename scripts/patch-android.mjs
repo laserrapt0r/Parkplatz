@@ -50,6 +50,8 @@ if (existsSync(propsPath)) {
 // and the exposed margins show the window background. Make that background
 // our app colour and keep the system-bar icons light, or a light-mode device
 // paints white bars with dark icons around the dark game.
+// NB: the activity runs with AppTheme.NoActionBar, whose explicit parent
+// bypasses the base AppTheme — the items must go into that style.
 const stylesPath = resolve(root, 'android/app/src/main/res/values/styles.xml');
 if (existsSync(stylesPath)) {
   let x = readFileSync(stylesPath, 'utf8');
@@ -61,10 +63,10 @@ if (existsSync(stylesPath)) {
     ].join('\n');
     const before = x;
     x = x.replace(
-      /(<style name="AppTheme"[^>]*>)/,
+      /(<style name="AppTheme\.NoActionBar"[^>]*>)/,
       `$1\n${items}`
     );
-    if (x === before) { console.error('WARNING: AppTheme not found in styles.xml — system bars not themed'); }
+    if (x === before) { console.error('WARNING: AppTheme.NoActionBar not found in styles.xml — system bars not themed'); }
     else { writeFileSync(stylesPath, x); console.log('patched styles.xml for edge-to-edge system bars'); }
   }
 }
