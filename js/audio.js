@@ -74,7 +74,7 @@
   const MUSIC_ROOT = [220.0, 261.63, 293.66, 329.63, 392.0]; // A3 C4 D4 E4 G4
   const BASS = [110.0, 130.81, 146.83, 98.0]; // A2 C3 D3 G2 per bar
   function musicTick() {
-    if (!ctx || !musicOn) return;
+    if (!ctx || !musicOn || !enabled) return; // global mute must silence music too
     const bar = Math.floor(musicStep / 8) % BASS.length;
     const t = ctx.currentTime;
     // bass note at start of each bar
@@ -110,13 +110,18 @@
 
   const Audio = {
     get enabled() { return enabled; },
-    setEnabled(on) { enabled = !!on; if (enabled) ensure(); },
+    setEnabled(on) {
+      enabled = !!on;
+      if (enabled) ensure();
+      // silence already-ringing music notes immediately, not after their decay
+      if (musicBus) musicBus.gain.value = enabled ? musicVol * 0.5 : 0;
+    },
     get musicEnabled() { return musicOn; },
     setMusicEnabled(on) {
       if (on) startMusic(); else stopMusic();
     },
     setSfxVol(v) { sfxVol = +v; if (master) master.gain.value = sfxVol; },
-    setMusicVol(v) { musicVol = +v; if (musicBus) musicBus.gain.value = musicVol * 0.5; },
+    setMusicVol(v) { musicVol = +v; if (musicBus && enabled) musicBus.gain.value = musicVol * 0.5; },
     // Must be called from a user gesture to unlock audio on most browsers.
     unlock() {
       ensure();
@@ -153,6 +158,19 @@
       noise({ dur: 0.5, gain: 0.08, freq: 380, q: 0.6 });
     },
   };
+
+  // Pause everything while the app is backgrounded: otherwise the music keeps
+  // playing over other apps / the lock screen and burns battery.
+  document.addEventListener('visibilitychange', () => {
+    if (!ctx) return;
+    if (document.hidden) {
+      if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+      ctx.suspend().catch(() => {});
+    } else {
+      ctx.resume().catch(() => {});
+      if (musicOn && !musicTimer) musicTimer = setInterval(musicTick, 380);
+    }
+  });
 
   window.Sfx = Audio;
 })();
